@@ -7,4 +7,6 @@ export async function ProtectRoute() {
     const token = await tokenService.getToken();
 
     if (!token) return redirectToAuth();
+
+    if (!(await tokenService.veryfyToken())) return redirectToAuth();
 }
