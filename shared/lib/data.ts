@@ -31,7 +31,6 @@ export interface Project {
     boards: Board[];
 }
 
-// Начальные данные для первой загрузки
 export const INITIAL_PROJECTS: Project[] = [
     {
         id: "proj-1",
@@ -55,3 +54,57 @@ export const INITIAL_PROJECTS: Project[] = [
         ]
     }
 ];
+
+// --- ДАННЫЕ ДЛЯ КАРТЫ ПРОЕКТОВ (Проект -> Роль -> Пользователь) ---
+export const PROJECT_HIERARCHY: any = {
+    "proj-1": {
+        id: "proj-1",
+        name: "VictoryGroup",
+        type: "project",
+        children: [
+            {
+                id: "role-admin-1",
+                name: "Admins",
+                type: "role",
+                children: [
+                    { id: "user-1", name: "Diniar Karimov", email: "mr.dinyar@gmail.com", type: "user" },
+                    { id: "user-2", name: "Sergey I.", email: "sergey@example.com", type: "user" }
+                ]
+            },
+            {
+                id: "role-member-1",
+                name: "Members",
+                type: "role",
+                children: [
+                    { id: "user-3", name: "Alex Mid", email: "alex@example.com", type: "user" },
+                    { id: "user-4", name: "Ivan Jun", email: "ivan@example.com", type: "user" },
+                    { id: "user-5", name: "Anna Py", email: "anna@example.com", type: "user" }
+                ]
+            }
+        ]
+    },
+    "proj-2": {
+        id: "proj-2",
+        name: "Landing Page",
+        type: "project",
+        children: [
+            {
+                id: "role-admin-2",
+                name: "Admins",
+                type: "role",
+                children: [
+                    { id: "user-6", name: "Maria Lead", email: "maria@example.com", type: "user" }
+                ]
+            },
+            {
+                id: "role-viewer-1",
+                name: "Viewers",
+                type: "role",
+                children: [
+                    { id: "user-7", name: "Oleg Design", email: "oleg@example.com", type: "user" },
+                    { id: "user-8", name: "Client QA", email: "client@example.com", type: "user" }
+                ]
+            }
+        ]
+    }
+};
