@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/shared/ui/button";
-import { Search, Bell, Settings, HelpCircle, User, LogOut, Moon, Sun } from "lucide-react";
+import { Search, Bell, Settings, HelpCircle, Grid3X3, User, LogOut, Moon, Sun, Map } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { MOCK_NOTIFICATIONS } from "@/shared/lib/data";
@@ -17,7 +17,6 @@ export function Header({ onCreateClick }: { onCreateClick?: () => void }) {
     const userMenuRef = useRef<HTMLDivElement>(null);
     const notifMenuRef = useRef<HTMLDivElement>(null);
 
-    // Закрытие дропдаунов при клике вне их области
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
@@ -46,7 +45,7 @@ export function Header({ onCreateClick }: { onCreateClick?: () => void }) {
                     xmlns="http://www.w3.org/2000/svg" 
                     viewBox="0 0 56 42" 
                     fill="none" 
-                    className="w-9 h-auto cursor-pointer shrink-0 ml-2"
+                    className="w-9 h-auto cursor-pointer text-blue-600 shrink-0 ml-2"
                 >
                     <path d="M56.3462 14.7422L26.9231 42V27.2578L56.3462 0V14.7422Z" className="symbol" fill="currentColor"></path>
                     <path d="M0 16.5398L11.0789 27.1327H26.9231V16.5398H0Z" className="symbol" fill="currentColor"></path>
@@ -67,6 +66,13 @@ export function Header({ onCreateClick }: { onCreateClick?: () => void }) {
                         Карта проектов
                     </button>
 
+                    <button
+                        onClick={() => router.push('/admin')}
+                        className={`whitespace-nowrap transition-colors ${pathname === '/admin' ? 'text-blue-600 font-semibold' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                        Админ-панель
+                    </button>
+
                     <Button size="sm" className="ml-2 bg-blue-600 hover:bg-blue-700 text-white whitespace-nowrap" onClick={onCreateClick}>
                         Создать
                     </Button>
@@ -79,7 +85,6 @@ export function Header({ onCreateClick }: { onCreateClick?: () => void }) {
                     <input placeholder="Поиск" className="w-full bg-muted/50 border border-transparent focus:border-blue-500 rounded-md pl-8 h-8 outline-none text-sm transition-all" />
                 </div>
 
-                {/* Выпадающее окно уведомлений */}
                 <div className="relative" ref={notifMenuRef}>
                     <Button variant="ghost" size="icon" className="text-muted-foreground w-8 h-8 relative" onClick={() => setNotifOpen(!notifOpen)}>
                         <Bell className="w-5 h-5" />
@@ -113,10 +118,13 @@ export function Header({ onCreateClick }: { onCreateClick?: () => void }) {
                     )}
                 </div>
 
-                <Button variant="ghost" size="icon" className="text-muted-foreground w-8 h-8"><HelpCircle className="w-5 h-5" /></Button>
+                {/* ССЫЛКА НА ОНБОРДИНГ */}
+                <Button variant="ghost" size="icon" className="text-muted-foreground w-8 h-8" onClick={() => router.push('/onboarding')}>
+                    <HelpCircle className="w-5 h-5" />
+                </Button>
+                
                 <Button variant="ghost" size="icon" className="text-muted-foreground w-8 h-8"><Settings className="w-5 h-5" /></Button>
 
-                {/* Выпадающее окно профиля */}
                 <div className="relative" ref={userMenuRef}>
                     <button onClick={() => setMenuOpen(!menuOpen)} className="w-8 h-8 rounded-full bg-blue-800 text-white text-xs font-bold flex items-center justify-center ml-1 ring-2 ring-transparent hover:ring-blue-500 transition-all">
                         DK
