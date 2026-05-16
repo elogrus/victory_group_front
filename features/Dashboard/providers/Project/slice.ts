@@ -1,33 +1,32 @@
+import pipelineService, { Pipeline } from "@/entity/Pipeline";
+import { Project } from "@/entity/Project";
 import { createAppSlice } from "@/shared/lib/createAppSlice";
-import projectService, { Project } from ".";
-import { Pipeline } from "../Pipeline";
-import { createSelector, PayloadAction } from "@reduxjs/toolkit";
 
 interface State {
     isLoading: boolean;
-    projects: Project[] | null;
+    pipelines: Pipeline[] | null;
     errors: string[];
 }
 
 const initialState: State = {
     isLoading: false,
-    projects: null,
+    pipelines: null,
     errors: [],
 };
 
-export const projectsSlice = createAppSlice({
-    name: "projects",
+export const projectSlice = createAppSlice({
+    name: "project",
     initialState,
     reducers: (create) => ({
         clear: create.reducer((state) => {
-            state.projects = null;
+            state.pipelines = null;
+            state.errors = [];
         }),
+
         // Асинхронный reducer (с createAsyncThunk-like поведением)
         fetchProjects: create.asyncThunk(
-            async (_, { rejectWithValue }) => {
-                console.log("FETCH PROJECTS");
-                const res = await projectService.getProjectList();
-                console.log("RES", res);
+            async (projectId: Project["id"], { rejectWithValue }) => {
+                const res = await pipelineService.getList(projectId);
                 if (!res.ok) {
                     return rejectWithValue(res.errors);
                 }
@@ -39,7 +38,7 @@ export const projectsSlice = createAppSlice({
                 },
                 fulfilled: (state, action) => {
                     state.isLoading = false;
-                    state.projects = action.payload;
+                    state.pipelines = action.payload;
                 },
                 rejected: (state, action) => {
                     state.isLoading = false;
@@ -49,23 +48,15 @@ export const projectsSlice = createAppSlice({
         ),
     }),
     selectors: {
-        selectProjects: (state) => state.projects,
+        selectPipelines: (state) => state.pipelines,
         selectIsLoading: (state) => state.isLoading,
         selectErrors: (state) => state.errors,
     },
 });
 
-export const selectProjectById = createSelector(
-    [
-        projectsSlice.selectors.selectProjects,
-        (_, projectId: Project["id"]) => projectId,
-    ],
-    (projects, projectId) => projects?.find((p) => p.id === projectId) ?? null,
-);
-
 // Экспорт actions
-export const { clear, fetchProjects } = projectsSlice.actions;
+export const { clear, fetchProjects } = projectSlice.actions;
 
 // Экспорт selectors
-export const { selectProjects, selectIsLoading, selectErrors } =
-    projectsSlice.selectors;
+export const { selectPipelines, selectIsLoading, selectErrors } =
+    projectSlice.selectors;

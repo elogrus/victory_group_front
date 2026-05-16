@@ -55,11 +55,11 @@ export function Sidebar() {
                     projects.map((p) => {
                         const isActive = p.id === Number(params.projectId);
                         return (
-                            <Button
-                                key={p.id}
-                                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap overflow-hidden ${isActive ? "bg-blue-600/10 text-blue-600" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
-                            >
-                                <Link href={`/d/${p.id}`}>
+                            <Link href={`/d/${p.id}`}>
+                                <Button
+                                    key={p.id}
+                                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap overflow-hidden ${isActive ? "bg-blue-600/10 text-blue-600" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+                                >
                                     <FolderDot
                                         className={`w-5 h-5 shrink-0 ${isActive ? "text-blue-600" : ""}`}
                                     />
@@ -68,8 +68,8 @@ export function Sidebar() {
                                             {p.name}
                                         </span>
                                     )}
-                                </Link>
-                            </Button>
+                                </Button>
+                            </Link>
                         );
                     })}
             </nav>

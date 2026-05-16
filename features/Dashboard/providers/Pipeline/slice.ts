@@ -1,33 +1,33 @@
+import pipelineService, { Pipeline, PipelineInfo } from "@/entity/Pipeline";
+import { Project } from "@/entity/Project";
 import { createAppSlice } from "@/shared/lib/createAppSlice";
-import projectService, { Project } from ".";
-import { Pipeline } from "../Pipeline";
-import { createSelector, PayloadAction } from "@reduxjs/toolkit";
+import { toast } from "sonner";
 
 interface State {
     isLoading: boolean;
-    projects: Project[] | null;
+    pipelineInfo: PipelineInfo | null;
     errors: string[];
 }
 
 const initialState: State = {
     isLoading: false,
-    projects: null,
+    pipelineInfo: null,
     errors: [],
 };
 
-export const projectsSlice = createAppSlice({
-    name: "projects",
+export const pipelineSlice = createAppSlice({
+    name: "pipeline",
     initialState,
     reducers: (create) => ({
         clear: create.reducer((state) => {
-            state.projects = null;
+            state.pipelineInfo = null;
+            state.errors = [];
         }),
+
         // Асинхронный reducer (с createAsyncThunk-like поведением)
-        fetchProjects: create.asyncThunk(
-            async (_, { rejectWithValue }) => {
-                console.log("FETCH PROJECTS");
-                const res = await projectService.getProjectList();
-                console.log("RES", res);
+        fetchPipelineInfo: create.asyncThunk(
+            async (pipelineId: Pipeline["id"], { rejectWithValue }) => {
+                const res = await pipelineService.getInfo(pipelineId);
                 if (!res.ok) {
                     return rejectWithValue(res.errors);
                 }
@@ -39,33 +39,30 @@ export const projectsSlice = createAppSlice({
                 },
                 fulfilled: (state, action) => {
                     state.isLoading = false;
-                    state.projects = action.payload;
+                    state.pipelineInfo = action.payload;
                 },
                 rejected: (state, action) => {
                     state.isLoading = false;
                     state.errors = action.payload as string[];
+                    toast.error(
+                        state.errors[0] ??
+                            "Произошла ошибка при загрузке пайплайна",
+                    );
                 },
             },
         ),
     }),
     selectors: {
-        selectProjects: (state) => state.projects,
+        selectAll: (state) => state,
+        selectPipelineInfo: (state) => state.pipelineInfo,
         selectIsLoading: (state) => state.isLoading,
         selectErrors: (state) => state.errors,
     },
 });
 
-export const selectProjectById = createSelector(
-    [
-        projectsSlice.selectors.selectProjects,
-        (_, projectId: Project["id"]) => projectId,
-    ],
-    (projects, projectId) => projects?.find((p) => p.id === projectId) ?? null,
-);
-
 // Экспорт actions
-export const { clear, fetchProjects } = projectsSlice.actions;
+export const { clear, fetchPipelineInfo } = pipelineSlice.actions;
 
 // Экспорт selectors
-export const { selectProjects, selectIsLoading, selectErrors } =
-    projectsSlice.selectors;
+export const { selectAll, selectPipelineInfo, selectIsLoading, selectErrors } =
+    pipelineSlice.selectors;

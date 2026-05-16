@@ -223,23 +223,6 @@ export default function Dashboard() {
         }
     };
 
-    const handleBoardDragEnd = (e: any) => {
-        const { active, over } = e;
-        if (!over || active.id === over.id) return;
-
-        setProjects((prev) =>
-            prev.map((p) => {
-                if (p.id !== activeProjId) return p;
-                const oldIndex = p.boards.findIndex((b) => b.id === active.id);
-                const newIndex = p.boards.findIndex((b) => b.id === over.id);
-                return {
-                    ...p,
-                    boards: arrayMove(p.boards, oldIndex, newIndex),
-                };
-            }),
-        );
-    };
-
     const handleCreateTask = (data: { title: string; tags: string[] }) => {
         const newTask: Task = {
             id: `KAN-${Date.now().toString().slice(-4)}`,

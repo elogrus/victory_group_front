@@ -1,5 +1,5 @@
 "use client";
-import { PipelineProvider } from "@/features/Dashboard/providers/PipelineProvider";
+import { PipelineProvider } from "@/features/Dashboard/providers/Pipeline/PipelineProvider";
 import { useParams } from "next/navigation";
 import { ReactNode } from "react";
 
