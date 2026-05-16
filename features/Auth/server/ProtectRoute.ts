@@ -1,4 +1,4 @@
-import tokenService from "@/core/Token/Service";
+import tokenService from "@/entity/Token";
 import { redirect } from "next/navigation";
 
 const redirectToAuth = () => redirect("/auth");

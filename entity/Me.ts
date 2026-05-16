@@ -1,4 +1,4 @@
-import { CONSTS } from "@/lib/consts";
+import { CONSTS } from "@/shared/lib/consts";
 
 class MeService {
     private ROUTES = {

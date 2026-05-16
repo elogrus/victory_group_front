@@ -1,5 +1,5 @@
-import { CONSTS } from "@/lib/consts";
-import { myFetch } from "@/lib/myFetch";
+import { CONSTS } from "@/shared/lib/consts";
+import { myFetch } from "@/shared/lib/myFetch";
 import { cookies } from "next/headers";
 
 export type Token = string;
