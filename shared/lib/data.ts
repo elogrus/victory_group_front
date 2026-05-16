@@ -35,8 +35,25 @@ export interface Project {
     id: string;
     name: string;
     boards: Board[];
-    assignments?: ProjectAssignment[]; 
+    assignments?: ProjectAssignment[];
 }
+
+// --- ОБНОВЛЕННАЯ МОДЕЛЬ ПОЛЬЗОВАТЕЛЯ ---
+export interface User {
+    id: string;
+    name: string;
+    login: string;
+    is_active: boolean;
+    is_superuser: boolean;
+    tg_id: number;
+    password?: string; // Только для создания
+}
+
+export const MOCK_USERS: User[] = [
+    { id: "1", name: "Diniar Karimov", login: "diniar", is_active: true, is_superuser: true, tg_id: 123456 },
+    { id: "2", name: "Пётр Петров", login: "petrov", is_active: true, is_superuser: false, tg_id: 0 },
+    { id: "3", name: "Alex Middle", login: "alex_m", is_active: false, is_superuser: false, tg_id: 0 },
+];
 
 export interface Role {
     id: string;
@@ -56,16 +73,14 @@ export interface Role {
 
 export const MOCK_ROLES: Role[] = [
     { 
-        id: "role-admin", 
-        name: "admin", 
+        id: "role-admin", name: "admin", 
         can_create_task: true, can_update_task: true, can_delete_task: true,
         can_manage_members: true, can_manage_pipelines: true, can_update_project: true,
         can_delete_project: true, can_manage_tags: true, can_manage_automation: true,
         can_view_analytics: true, can_assign_task: true 
     },
     { 
-        id: "role-viewer", 
-        name: "viewer", 
+        id: "role-viewer", name: "viewer", 
         can_create_task: false, can_update_task: false, can_delete_task: false,
         can_manage_members: false, can_manage_pipelines: false, can_update_project: false,
         can_delete_project: false, can_manage_tags: false, can_manage_automation: false,
@@ -73,19 +88,13 @@ export const MOCK_ROLES: Role[] = [
     },
 ];
 
-export const MOCK_USERS = [
-    { id: "1", login: "diniar", name: "Diniar Karimov", password: "hashed_password", is_super_user: true },
-    { id: "2", login: "alex_m", name: "Alex Middle", password: "hashed_password", is_super_user: false },
-    { id: "3", login: "ivan_j", name: "Ivan Junior", password: "hashed_password", is_super_user: false },
-];
-
 export const INITIAL_PROJECTS: Project[] = [
     {
         id: "proj-1",
         name: "VictoryGroup",
         assignments: [
-            { userId: "user-1", roleId: "role-admin" },
-            { userId: "user-2", roleId: "role-member" }
+            { userId: "1", roleId: "role-admin" },
+            { userId: "2", roleId: "role-viewer" }
         ],
         boards: [
             {
@@ -96,10 +105,7 @@ export const INITIAL_PROJECTS: Project[] = [
                     { id: "in-progress", title: "IN PROGRESS", color: "#0052cc" },
                     { id: "done", title: "DONE", color: "#36b37e" },
                 ],
-                tasks: [
-                    { id: "KAN-1", title: "Задача 1", description: "Описание", status: "done", priority: "Low", author: "Diniar Karimov", assignee: null, tags: ["frontend", "bug"], createdAt: "15 мая", updatedAt: "15 мая" },
-                    { id: "KAN-4", title: "Настроить FastAPI", description: "Тест", status: "todo", priority: "Medium", author: "Diniar Karimov", assignee: null, tags: ["backend"], createdAt: "15 мая", updatedAt: "15 мая" }
-                ]
+                tasks: []
             }
         ]
     }
