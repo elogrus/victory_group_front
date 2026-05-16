@@ -1,5 +1,5 @@
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/shared/ui/dialog";
+import { Button } from "@/shared/ui/button";
 import { Eye, ThumbsUp, Share2, MoreHorizontal, X, Paperclip, Link, User, Zap, ChevronDown, CheckSquare } from "lucide-react";
 
 export function TaskModal({ task, isOpen, onClose }: any) {

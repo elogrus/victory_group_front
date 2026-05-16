@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/ui/button";
+import { Button } from "@/shared/ui/button";
 import {
     Search,
     Bell,
@@ -37,9 +37,9 @@ export function Header({ onCreateClick }: { onCreateClick: () => void }) {
                 </Button>
                 <div className="font-bold text-xl text-blue-600 tracking-tight flex items-center gap-1">
                     <div className="w-6 h-6 bg-blue-600 rounded flex items-center justify-center text-white font-bold text-xs">
-                        J
+                        V
                     </div>{" "}
-                    Vira
+                    VictoryGroup
                 </div>
                 <nav className="hidden xl:flex gap-5 ml-6 text-sm font-medium text-muted-foreground">
                     <a href="#" className="hover:text-foreground">

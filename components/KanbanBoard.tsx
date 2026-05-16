@@ -17,7 +17,7 @@ import {
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Card, CardContent } from "@/components/ui/ui/card";
+import { Card, CardContent } from "@/shared/ui/card";
 import {
     Task,
     TaskStatus,
