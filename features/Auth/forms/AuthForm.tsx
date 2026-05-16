@@ -2,23 +2,20 @@
 import meService from "@/entity/Me";
 import { cn } from "@/shared/lib/utils";
 import { emailSchema } from "@/shared/schemes/emailSchema";
-import { passwordSchema } from "@/shared/schemes/passwordSchema";
 import { Button } from "@/shared/ui/button";
 import {
     Field,
     FieldDescription,
     FieldGroup,
     FieldLabel,
-    FieldSeparator,
 } from "@/shared/ui/field";
 import { Input } from "@/shared/ui/input";
 import { Spinner } from "@/shared/ui/spinner";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import z from "zod";
 import { toast } from "sonner";
+import z from "zod";
 
 const formSchema = z.object({
     email: emailSchema,
