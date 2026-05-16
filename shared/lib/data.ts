@@ -35,10 +35,9 @@ export interface Project {
     id: string;
     name: string;
     boards: Board[];
-    assignments?: ProjectAssignment[]; // <--- Связь пользователей и ролей в проекте
+    assignments?: ProjectAssignment[]; 
 }
 
-// --- НОВЫЕ СУЩНОСТИ ДЛЯ АДМИНКИ ---
 export const MOCK_ROLES = [
     { id: "role-admin", name: "Admin", color: "bg-red-100 text-red-700 border-red-200" },
     { id: "role-member", name: "Member", color: "bg-blue-100 text-blue-700 border-blue-200" },
@@ -46,9 +45,9 @@ export const MOCK_ROLES = [
 ];
 
 export const MOCK_USERS = [
-    { id: "user-1", name: "Diniar Karimov", email: "mr.dinyar@gmail.com", is_super_user: true },
-    { id: "user-2", name: "Alex Middle", email: "alex@example.com", is_super_user: false },
-    { id: "user-3", name: "Ivan Junior", email: "ivan@example.com", is_super_user: false },
+    { id: "1", login: "diniar", name: "Diniar Karimov", password: "hashed_password", is_super_user: true },
+    { id: "2", login: "alex_m", name: "Alex Middle", password: "hashed_password", is_super_user: false },
+    { id: "3", login: "ivan_j", name: "Ivan Junior", password: "hashed_password", is_super_user: false },
 ];
 
 export const INITIAL_PROJECTS: Project[] = [
