@@ -6,7 +6,7 @@ export default async function DashboardLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    // await ProtectRoute();
+    await ProtectRoute();
 
     return (
         <ProjectsProvider>

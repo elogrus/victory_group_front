@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 
 export type Token = string;
 class TokenService {
-    private TOKEN_KEY = "token";
+    private TOKEN_KEY = "access_token";
     private ROUTES = {
         verify: CONSTS.API_URL + "/verify",
     };
@@ -13,11 +13,6 @@ class TokenService {
         const token = cookieStore.get(this.TOKEN_KEY)?.value as Token | null;
 
         return token;
-    }
-    async veryfyToken() {
-        const res = await myFetch(this.ROUTES.verify);
-        if (res.ok) return true;
-        return false;
     }
 }
 const tokenService = new TokenService();

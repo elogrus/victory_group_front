@@ -22,16 +22,16 @@ const nextConfig: NextConfig = {
 
     async redirects() {
         return [
-            {
-                source: "/d/team",
-                destination: "/d",
-                permanent: true,
-            },
-            {
-                source: "/d/team/:teamId",
-                destination: "/d/team/:teamId/members",
-                permanent: true,
-            },
+            // {
+            //     source: "/d/team",
+            //     destination: "/d",
+            //     permanent: true,
+            // },
+            // {
+            //     source: "/d/team/:teamId",
+            //     destination: "/d/team/:teamId/members",
+            //     permanent: true,
+            // },
         ];
     },
 };

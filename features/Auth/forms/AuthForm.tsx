@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import z from "zod";
 
 const formSchema = z.object({
-    email: emailSchema,
+    login: z.string(),
     password: z.string(),
 });
 
@@ -34,7 +34,7 @@ export function AuthForm({
         resolver: zodResolver(formSchema),
 
         defaultValues: {
-            email: "",
+            login: "",
             password: "",
         },
     });
@@ -42,7 +42,7 @@ export function AuthForm({
     return (
         <form
             onSubmit={handleSubmit(async (data) => {
-                const res = await meService.login(data.email, data.password);
+                const res = await meService.login(data.login, data.password);
                 if (res.ok) {
                     router.push("/d");
                 } else {
@@ -61,20 +61,20 @@ export function AuthForm({
                         Описание бла бла
                     </p>
                 </div>
-                <Field data-invalid={!!errors.email}>
-                    <FieldLabel htmlFor="email">Email</FieldLabel>
+                <Field data-invalid={!!errors.login}>
+                    <FieldLabel htmlFor="login">Логин</FieldLabel>
                     <Input
-                        id="email"
+                        id="login"
                         placeholder="email@example.com"
-                        {...register("email")}
+                        {...register("login")}
                     />
-                    {errors.email && (
+                    {errors.login && (
                         <FieldDescription>
-                            {errors.email.message}
+                            {errors.login.message}
                         </FieldDescription>
                     )}
                 </Field>
-                <Field data-invalid={!!errors.email}>
+                <Field data-invalid={!!errors.password}>
                     <FieldLabel htmlFor="password">Пароль</FieldLabel>
                     <Input
                         id="password"

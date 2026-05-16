@@ -21,7 +21,16 @@ export const myFetch = async <T = unknown>(
     ...args: Parameters<typeof fetch>
 ): Promise<FetchResult<T>> => {
     try {
-        const res = await fetch(...args);
+        const url = args[0];
+        const opts = args[1];
+        const res = await fetch(url, {
+            ...opts,
+            headers: {
+                "Content-Type": "application/json",
+                ...opts?.headers,
+            },
+            credentials: "include",
+        });
 
         if (res.status === 401) {
             console.log("dispatch event");

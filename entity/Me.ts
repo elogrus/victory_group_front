@@ -3,7 +3,7 @@ import { myFetch } from "@/shared/lib/myFetch";
 
 class MeService {
     private ROUTES = {
-        login: CONSTS.API_URL + "/auth/token",
+        login: CONSTS.API_URL + "/auth/tokens",
     };
     async login(login: string, password: string) {
         return await myFetch(this.ROUTES.login, {

@@ -10,12 +10,14 @@ import {
     selectProjects,
 } from "@/entity/Project/slice";
 import { Spinner } from "@/shared/ui/spinner";
+import Link from "next/link";
 
 export function Sidebar() {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(true);
     const projects = useAppSelector(selectProjects);
     const isLoading = useAppSelector(selectIsLoading);
     const errors = useAppSelector(selectErrors);
+
     return (
         <aside
             className={`relative border-r bg-muted/10 transition-all duration-300 flex flex-col shrink-0 min-h-screen ${isOpen ? "w-64" : "w-16"}`}
@@ -48,18 +50,21 @@ export function Sidebar() {
                         // const isActive = p.id === activeProjId;
                         const isActive = p.id === 123;
                         return (
-                            <button
+                            <Button
                                 key={p.id}
-                                onClick={() => onSelect(p.id)}
                                 className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap overflow-hidden ${isActive ? "bg-blue-600/10 text-blue-600" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
                             >
-                                <FolderDot
-                                    className={`w-5 h-5 shrink-0 ${isActive ? "text-blue-600" : ""}`}
-                                />
-                                {isOpen && (
-                                    <span className="truncate">{p.name}</span>
-                                )}
-                            </button>
+                                <Link href={`/d/${p.id}`}>
+                                    <FolderDot
+                                        className={`w-5 h-5 shrink-0 ${isActive ? "text-blue-600" : ""}`}
+                                    />
+                                    {isOpen && (
+                                        <span className="truncate">
+                                            {p.name}
+                                        </span>
+                                    )}
+                                </Link>
+                            </Button>
                         );
                     })}
             </nav>

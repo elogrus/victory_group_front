@@ -1,7 +1,6 @@
 "use client";
 
 import { useAppDispatch } from "@/shared/hooks/reduxHooks";
-import createAccurateContext from "@/shared/lib/createAccurateContext";
 import { ReactNode, useLayoutEffect } from "react";
 import { fetchProjects } from "./slice";
 
