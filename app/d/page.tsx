@@ -1,3 +1,5 @@
+import { Sidebar } from "@/widgets/Sidebar";
+
 export default async function asd({
     children,
 }: Readonly<{
@@ -5,7 +7,7 @@ export default async function asd({
 }>) {
     return (
         <div className="w-full grid grid-rows-[min-content_auto] grid-cols-[240px_1fr] mx-auto">
-            хуй
+            <Sidebar />
         </div>
     );
 }

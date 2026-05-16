@@ -6,6 +6,7 @@ import { PayloadAction } from "@reduxjs/toolkit";
 interface State {
     isLoading: boolean;
     projects: Project[] | null;
+    currentProject: Project["id"] | null;
     currentPipeline: Pipeline["id"] | null;
     errors: string[] | null;
 }
@@ -13,6 +14,7 @@ interface State {
 const initialState: State = {
     isLoading: false,
     projects: null,
+    currentProject: null,
     currentPipeline: null,
     errors: null,
 };
@@ -24,6 +26,11 @@ export const projectsSlice = createAppSlice({
         clear: create.reducer((state) => {
             state.projects = null;
         }),
+        setCurrentProject: create.reducer(
+            (state, action: PayloadAction<Project["id"]>) => {
+                state.currentProject = action.payload;
+            },
+        ),
         setCurrentPipeline: create.reducer(
             (state, action: PayloadAction<Pipeline["id"]>) => {
                 state.currentPipeline = action.payload;
@@ -34,10 +41,8 @@ export const projectsSlice = createAppSlice({
             async (_, { rejectWithValue }) => {
                 const res = await projectService.getProjectList();
                 if (!res.ok) {
-                    console.log("ошибка getUser UserSlice");
                     return rejectWithValue(res.errors);
                 }
-                console.log("OK getUser UserSlice");
                 return res.body;
             },
             {
