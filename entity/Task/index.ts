@@ -1,5 +1,8 @@
-import { Project } from "./Project";
-import { User } from "./User";
+import { myFetch } from "@/shared/lib/myFetch";
+import { Pipeline } from "../Pipeline";
+import { Project } from "../Project";
+import { User } from "../User";
+import { CONSTS } from "@/shared/lib/consts";
 
 export type Task = {
     id: number;
@@ -19,8 +22,16 @@ export type Task = {
 };
 
 class TaskService {
-    private ROUTES = {};
-    async getList(projectId: Project["id"]) {}
+    private ROUTES = {
+        default: (projectId: Project["id"]) =>
+            CONSTS.API_URL + `/projects/${projectId}/tasks`,
+    };
+    async getAll(projectId: Project["id"]) {}
+    async getAllPipeline(projectId: Project["id"], pipelineId: Pipeline["id"]) {
+        return await myFetch<Task[]>(this.ROUTES.default(projectId), {
+            method: "GET",
+        });
+    }
     async create(projectId: Project["id"]) {}
     async get(projectId: Project["id"], taskId: Task["id"]) {}
     async update(projectId: Project["id"], taskId: Task["id"]) {}
