@@ -1,8 +1,9 @@
-import { cookies } from "next/headers";
-import { Token, TokenRepo } from "./Repo";
 import { CONSTS } from "@/lib/consts";
-import ky from "ky";
-class TokenService extends TokenRepo {
+import { myFetch } from "@/lib/myFetch";
+import { cookies } from "next/headers";
+
+export type Token = string;
+class TokenService {
     private TOKEN_KEY = "token";
     private ROUTES = {
         verify: CONSTS.API_URL + "/verify",
@@ -14,8 +15,8 @@ class TokenService extends TokenRepo {
         return token;
     }
     async veryfyToken() {
-        const res = await ky.post<boolean>(this.ROUTES.verify);
-        if (res.ok && (await res.json())) return true;
+        const res = await myFetch(this.ROUTES.verify);
+        if (res.ok) return true;
         return false;
     }
 }
