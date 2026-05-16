@@ -4,15 +4,21 @@ import { Plus, FolderDot, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { useState } from "react";
 import { useAppSelector } from "@/shared/hooks/reduxHooks";
-import { selectProjects } from "@/entity/Project/slice";
+import {
+    selectErrors,
+    selectIsLoading,
+    selectProjects,
+} from "@/entity/Project/slice";
+import { Spinner } from "@/shared/ui/spinner";
 
 export function Sidebar() {
-    const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
     const projects = useAppSelector(selectProjects);
-
+    const isLoading = useAppSelector(selectIsLoading);
+    const errors = useAppSelector(selectErrors);
     return (
         <aside
-            className={`relative border-r bg-muted/10 transition-all duration-300 flex flex-col shrink-0 ${isOpen ? "w-64" : "w-16"}`}
+            className={`relative border-r bg-muted/10 transition-all duration-300 flex flex-col shrink-0 min-h-screen ${isOpen ? "w-64" : "w-16"}`}
         >
             <div className="p-4 flex items-center justify-between border-b h-14 shrink-0">
                 {isOpen && (
@@ -35,23 +41,27 @@ export function Sidebar() {
             </div>
 
             <nav className="p-2 flex-1 flex flex-col gap-1 overflow-y-auto overflow-x-hidden no-scrollbar">
-                {projects.map((p: any) => {
-                    const isActive = p.id === activeProjId;
-                    return (
-                        <button
-                            key={p.id}
-                            onClick={() => onSelect(p.id)}
-                            className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap overflow-hidden ${isActive ? "bg-blue-600/10 text-blue-600" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
-                        >
-                            <FolderDot
-                                className={`w-5 h-5 shrink-0 ${isActive ? "text-blue-600" : ""}`}
-                            />
-                            {isOpen && (
-                                <span className="truncate">{p.name}</span>
-                            )}
-                        </button>
-                    );
-                })}
+                {isLoading && <Spinner />}
+                {errors && "Произошла ошибка: " + errors[0]}
+                {projects &&
+                    projects.map((p: any) => {
+                        // const isActive = p.id === activeProjId;
+                        const isActive = p.id === 123;
+                        return (
+                            <button
+                                key={p.id}
+                                onClick={() => onSelect(p.id)}
+                                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap overflow-hidden ${isActive ? "bg-blue-600/10 text-blue-600" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+                            >
+                                <FolderDot
+                                    className={`w-5 h-5 shrink-0 ${isActive ? "text-blue-600" : ""}`}
+                                />
+                                {isOpen && (
+                                    <span className="truncate">{p.name}</span>
+                                )}
+                            </button>
+                        );
+                    })}
             </nav>
 
             <button

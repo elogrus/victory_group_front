@@ -20,31 +20,44 @@ export type FetchResult<T = unknown> =
 export const myFetch = async <T = unknown>(
     ...args: Parameters<typeof fetch>
 ): Promise<FetchResult<T>> => {
-    const res = await fetch(...args);
+    try {
+        const res = await fetch(...args);
 
-    if (res.status === 401) {
-        console.log("dispatch event");
-        const event = new CustomEvent("accessDenied");
-        document.dispatchEvent(event);
-    }
+        if (res.status === 401) {
+            console.log("dispatch event");
+            const event = new CustomEvent("accessDenied");
+            document.dispatchEvent(event);
+        }
 
-    if (res.ok) {
+        if (res.ok) {
+            const result: FetchResult<T> = {
+                ok: true,
+                status: res.status,
+                res: res,
+                errors: [],
+                body: res.bodyUsed ? await res.json() : null,
+            };
+            return result;
+        }
+
         const result: FetchResult<T> = {
-            ok: true,
+            ok: res.ok,
             status: res.status,
             res: res,
-            errors: [],
-            body: res.bodyUsed ? await res.json() : null,
+            errors: res.bodyUsed
+                ? ((await res.json()) as string[])
+                : ["Произошла какая-то ошибка"],
         };
+
+        return result;
+    } catch (error) {
+        const result: FetchResult<T> = {
+            ok: false,
+            res: new Response(),
+            status: 500,
+            errors: ["Ошибка соединения"],
+        };
+
         return result;
     }
-
-    const result: FetchResult<T> = {
-        ok: res.ok,
-        status: res.status,
-        res: res,
-        errors: res.bodyUsed ? ((await res.json()) as string[]) : [],
-    };
-
-    return result;
 };

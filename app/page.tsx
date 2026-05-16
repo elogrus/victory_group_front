@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Header } from "@/widgets/Header/Header";
-import { Sidebar } from "@/widgets/Sidebar";
+import { Sidebar } from "@/features/Sidebar/ui/Sidebar";
 import { KanbanBoard } from "@/widgets/KanbanBoard/KanbanBoard";
 import { ListView } from "@/entity/Task/ui/ListView";
 import { SummaryView } from "@/entity/Project/ui/SummaryView";

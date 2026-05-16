@@ -2,7 +2,6 @@
 
 import { useAppDispatch } from "@/shared/hooks/reduxHooks";
 import { ReactNode, useLayoutEffect } from "react";
-import { fetchPipelines } from "./slice";
 import { Project } from "../Project";
 
 export function PipelinesProvider({
@@ -13,9 +12,6 @@ export function PipelinesProvider({
     children: ReactNode;
 }) {
     if (!projectId) throw new Error("No projectId in PipelinesProvider!");
-    const dispatch = useAppDispatch();
-    useLayoutEffect(() => {
-        dispatch(fetchPipelines(projectId));
-    }, [dispatch]);
+    useLayoutEffect(() => {}, [dispatch]);
     return children;
 }

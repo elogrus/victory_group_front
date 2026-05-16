@@ -6,17 +6,13 @@ import { PayloadAction } from "@reduxjs/toolkit";
 interface State {
     isLoading: boolean;
     projects: Project[] | null;
-    currentProject: Project["id"] | null;
-    currentPipeline: Pipeline["id"] | null;
-    errors: string[] | null;
+    errors: string[];
 }
 
 const initialState: State = {
     isLoading: false,
     projects: null,
-    currentProject: null,
-    currentPipeline: null,
-    errors: null,
+    errors: [],
 };
 
 export const projectsSlice = createAppSlice({
@@ -26,16 +22,6 @@ export const projectsSlice = createAppSlice({
         clear: create.reducer((state) => {
             state.projects = null;
         }),
-        setCurrentProject: create.reducer(
-            (state, action: PayloadAction<Project["id"]>) => {
-                state.currentProject = action.payload;
-            },
-        ),
-        setCurrentPipeline: create.reducer(
-            (state, action: PayloadAction<Pipeline["id"]>) => {
-                state.currentPipeline = action.payload;
-            },
-        ),
         // Асинхронный reducer (с createAsyncThunk-like поведением)
         fetchProjects: create.asyncThunk(
             async (_, { rejectWithValue }) => {
@@ -55,27 +41,21 @@ export const projectsSlice = createAppSlice({
                 },
                 rejected: (state, action) => {
                     state.isLoading = false;
-                    state.errors = (action.payload as string[]) || null;
+                    state.errors = action.payload as string[];
                 },
             },
         ),
     }),
     selectors: {
         selectProjects: (state) => state.projects,
-        selectCurrentPipeline: (state) => state.currentPipeline,
         selectIsLoading: (state) => state.isLoading,
         selectErrors: (state) => state.errors,
     },
 });
 
 // Экспорт actions
-export const { clear, fetchProjects, setCurrentPipeline } =
-    projectsSlice.actions;
+export const { clear, fetchProjects } = projectsSlice.actions;
 
 // Экспорт selectors
-export const {
-    selectProjects,
-    selectIsLoading,
-    selectErrors,
-    selectCurrentPipeline,
-} = projectsSlice.selectors;
+export const { selectProjects, selectIsLoading, selectErrors } =
+    projectsSlice.selectors;

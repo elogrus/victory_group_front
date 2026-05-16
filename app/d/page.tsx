@@ -1,4 +1,4 @@
-import { Sidebar } from "@/widgets/Sidebar";
+import { Sidebar } from "@/features/Sidebar/ui/Sidebar";
 
 export default async function asd({
     children,
