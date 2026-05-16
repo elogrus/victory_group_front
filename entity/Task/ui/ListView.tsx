@@ -6,7 +6,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/shared/ui/table";
-import { Task } from "../shared/lib/data";
+import { Task } from "../../../shared/lib/data";
 
 export function ListView({
     tasks,

@@ -1,12 +1,13 @@
 "use client";
 
 import { Button } from "@/shared/ui/button";
-import { Search, Bell, Settings, HelpCircle, Grid3X3, User, LogOut, Moon, Sun, Map } from "lucide-react";
+import { Search, Bell, Settings, HelpCircle, Grid3X3, User, LogOut, Moon, Sun } from "lucide-react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export function Header({ onCreateClick }: { onCreateClick?: () => void }) {
     const router = useRouter();
+    const pathname = usePathname();
     const [menuOpen, setMenuOpen] = useState(false);
     const [isDark, setIsDark] = useState(true);
 
@@ -20,26 +21,27 @@ export function Header({ onCreateClick }: { onCreateClick?: () => void }) {
             <div className="flex items-center gap-4">
                 <Button variant="ghost" size="icon" className="w-8 h-8 text-muted-foreground"><Grid3X3 className="w-5 h-5" /></Button>
                 
-                <div 
-                    onClick={() => router.push('/')}
-                    className="font-bold text-xl text-blue-600 tracking-tight flex items-center gap-1 cursor-pointer"
-                >
+                <div onClick={() => router.push('/')} className="font-bold text-xl text-blue-600 tracking-tight flex items-center gap-1 cursor-pointer">
                     <div className="w-6 h-6 bg-blue-600 rounded flex items-center justify-center text-white font-bold text-xs">J</div> Jira
                 </div>
 
-                <nav className="hidden xl:flex gap-5 ml-6 text-sm font-medium text-muted-foreground">
-                    <button onClick={() => router.push('/')} className="hover:text-foreground transition-colors">Ваша работа</button>
-                    <button onClick={() => router.push('/')} className="hover:text-foreground transition-colors">Проекты</button>
-                    <button className="hover:text-foreground transition-colors">Фильтры</button>
-                    <button className="hover:text-foreground transition-colors">Дашборды</button>
+                <nav className="hidden xl:flex gap-5 ml-6 text-sm font-medium items-center">
+                    <button 
+                        onClick={() => router.push('/')} 
+                        className={`transition-colors ${pathname === '/' ? 'text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                        Проекты
+                    </button>
                     
-                    {/* Переход на Карту Проектов */}
                     <button 
                         onClick={() => router.push('/map')} 
-                        className="flex items-center gap-1 text-blue-600 hover:text-blue-700 bg-blue-600/10 px-3 py-1.5 rounded-md transition-colors"
+                        className={`transition-colors ${pathname === '/map' ? 'text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'}`}
                     >
-                        <Map className="w-4 h-4"/> Карта проектов
+                        Карта проектов
                     </button>
+
+                    <button className="text-muted-foreground hover:text-foreground transition-colors">Фильтры</button>
+                    <button className="text-muted-foreground hover:text-foreground transition-colors">Дашборды</button>
                     
                     <Button size="sm" className="ml-2 bg-blue-600 hover:bg-blue-700 text-white" onClick={onCreateClick}>Создать</Button>
                 </nav>
@@ -58,7 +60,6 @@ export function Header({ onCreateClick }: { onCreateClick?: () => void }) {
                     <button onClick={() => setMenuOpen(!menuOpen)} className="w-8 h-8 rounded-full bg-blue-800 text-white text-xs font-bold flex items-center justify-center ml-1 ring-2 ring-transparent hover:ring-blue-500 transition-all">
                         DK
                     </button>
-                    
                     {menuOpen && (
                         <div className="absolute right-0 top-10 w-64 bg-popover border rounded-md shadow-lg py-2 flex flex-col text-sm z-50">
                             <div className="px-4 py-3 border-b flex items-center gap-3">
@@ -69,13 +70,12 @@ export function Header({ onCreateClick }: { onCreateClick?: () => void }) {
                                 </div>
                             </div>
                             <button className="flex items-center gap-3 px-4 py-2 hover:bg-muted text-left text-foreground"><User className="w-4 h-4"/> Профиль</button>
-                            <button className="flex items-center gap-3 px-4 py-2 hover:bg-muted text-left text-foreground"><Settings className="w-4 h-4"/> Настройки аккаунта</button>
                             <button onClick={toggleTheme} className="flex items-center justify-between px-4 py-2 hover:bg-muted text-left text-foreground">
                                 <div className="flex items-center gap-3">{isDark ? <Moon className="w-4 h-4"/> : <Sun className="w-4 h-4"/>} Тема</div>
                                 <span className="text-xs text-muted-foreground">{isDark ? 'Темная' : 'Светлая'}</span>
                             </button>
                             <div className="border-t mt-2 pt-2">
-                                <button onClick={() => router.push('/login')} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-muted text-left text-foreground"><LogOut className="w-4 h-4"/> Выйти</button>
+                                <button onClick={() => router.push('/auth')} className="w-full flex items-center gap-3 px-4 py-2 hover:bg-muted text-left text-foreground"><LogOut className="w-4 h-4"/> Выйти</button>
                             </div>
                         </div>
                     )}

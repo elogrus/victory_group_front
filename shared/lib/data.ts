@@ -8,6 +8,7 @@ export interface Task {
     priority: string;
     author: string;
     assignee: string | null;
+    tags: string[];
     createdAt: string;
     updatedAt: string;
 }
@@ -45,10 +46,8 @@ export const INITIAL_PROJECTS: Project[] = [
                     { id: "done", title: "DONE", color: "#36b37e" },
                 ],
                 tasks: [
-                    { id: "KAN-1", title: "Задача 1", description: "Описание первой задачи", status: "done", priority: "Low", author: "Diniar Karimov", assignee: null, createdAt: "15 мая 2026 г., 21:24", updatedAt: "15 мая 2026 г., 22:21" },
-                    { id: "KAN-4", title: "Настроить FastAPI", description: "Тестовая задача", status: "todo", priority: "Medium", author: "Diniar Karimov", assignee: null, createdAt: "15 мая 2026 г., 22:25", updatedAt: "15 мая 2026 г., 22:25" },
-                    { id: "KAN-5", title: "Добавить авторизацию", description: "Еще одна", status: "todo", priority: "Medium", author: "Diniar Karimov", assignee: null, createdAt: "15 мая 2026 г., 22:25", updatedAt: "15 мая 2026 г., 22:25" },
-                    { id: "KAN-2", title: "Задача 2", description: "В процессе выполнения", status: "in-progress", priority: "High", author: "Diniar Karimov", assignee: null, createdAt: "15 мая 2026 г., 21:25", updatedAt: "15 мая 2026 г., 21:25" },
+                    { id: "KAN-1", title: "Задача 1", description: "Описание", status: "done", priority: "Low", author: "Diniar Karimov", assignee: null, tags: ["frontend", "bug"], createdAt: "15 мая", updatedAt: "15 мая" },
+                    { id: "KAN-4", title: "Настроить FastAPI", description: "Тест", status: "todo", priority: "Medium", author: "Diniar Karimov", assignee: null, tags: ["backend"], createdAt: "15 мая", updatedAt: "15 мая" }
                 ]
             }
         ]
