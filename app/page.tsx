@@ -16,39 +16,27 @@ import { Button } from "@/shared/ui/button";
 type ViewMode = "summary" | "list" | "board";
 
 export default function Dashboard() {
-    // Состояние дерева данных
     const [projects, setProjects] = useState<Project[]>(INITIAL_PROJECTS);
     
-    // Активные сущности
     const [activeProjId, setActiveProjId] = useState(INITIAL_PROJECTS[0].id);
     const [activeBoardId, setActiveBoardId] = useState(INITIAL_PROJECTS[0].boards[0].id);
     const [view, setView] = useState<ViewMode>("board");
 
-    // UI состояния
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [isCreateModalOpen, setCreateModalOpen] = useState(false);
     const [isProjectModalOpen, setProjectModalOpen] = useState(false);
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
-    // Вычисляемые активные данные
     const activeProject = projects.find(p => p.id === activeProjId) || projects[0];
     const activeBoard = activeProject.boards.find(b => b.id === activeBoardId) || activeProject.boards[0];
 
-    // --- Обработчики создания ---
     const handleCreateProject = (name: string) => {
         const newProjId = `proj-${Date.now()}`;
         const newBoardId = `board-${Date.now()}`;
         const newProj: Project = {
             id: newProjId,
             name,
-            boards: [
-                {
-                    id: newBoardId,
-                    name: "Основная доска",
-                    columns: [{ id: "todo", title: "TO DO", color: "#ebecf0" }],
-                    tasks: []
-                }
-            ]
+            boards: [{ id: newBoardId, name: "Основная доска", columns: [{ id: "todo", title: "TO DO", color: "#ebecf0" }], tasks: [] }]
         };
         setProjects([...projects, newProj]);
         setActiveProjId(newProjId);
@@ -61,8 +49,7 @@ export default function Dashboard() {
         
         const newBoardId = `board-${Date.now()}`;
         const newBoard = {
-            id: newBoardId,
-            name,
+            id: newBoardId, name,
             columns: [{ id: "todo", title: "TO DO", color: "#ebecf0" }],
             tasks: []
         };
@@ -71,22 +58,15 @@ export default function Dashboard() {
         setActiveBoardId(newBoardId);
     };
 
-    // --- Глубокое обновление доски (Задачи и Колонки) ---
     const setBoardTasks = (newTasks: any) => {
         setProjects(prev => prev.map(p => p.id === activeProjId ? {
-            ...p,
-            boards: p.boards.map(b => b.id === activeBoardId ? { 
-                ...b, tasks: typeof newTasks === 'function' ? newTasks(b.tasks) : newTasks 
-            } : b)
+            ...p, boards: p.boards.map(b => b.id === activeBoardId ? { ...b, tasks: typeof newTasks === 'function' ? newTasks(b.tasks) : newTasks } : b)
         } : p));
     };
 
     const setBoardColumns = (newCols: any) => {
         setProjects(prev => prev.map(p => p.id === activeProjId ? {
-            ...p,
-            boards: p.boards.map(b => b.id === activeBoardId ? { 
-                ...b, columns: typeof newCols === 'function' ? newCols(b.columns) : newCols 
-            } : b)
+            ...p, boards: p.boards.map(b => b.id === activeBoardId ? { ...b, columns: typeof newCols === 'function' ? newCols(b.columns) : newCols } : b)
         } : p));
     };
 
@@ -124,7 +104,6 @@ export default function Dashboard() {
                             </Button>
                         </div>
 
-                        {/* Навигация по ДОСКАМ внутри проекта */}
                         <div className="flex items-center gap-2 mb-4 overflow-x-auto no-scrollbar py-1">
                             {activeProject.boards.map(board => (
                                 <button
@@ -140,7 +119,6 @@ export default function Dashboard() {
                             </Button>
                         </div>
 
-                        {/* Навигация ВИДОВ (Сводка/Список/Доска) */}
                         <div className="flex gap-6 text-sm font-medium border-b border-border/50">
                             <button onClick={() => setView("summary")} className={`pb-3 border-b-2 transition-colors ${view === "summary" ? "border-blue-600 text-blue-600" : "border-transparent text-muted-foreground hover:text-foreground"}`}>Сводка</button>
                             <button onClick={() => setView("list")} className={`pb-3 border-b-2 transition-colors ${view === "list" ? "border-blue-600 text-blue-600" : "border-transparent text-muted-foreground hover:text-foreground"}`}>Список</button>
@@ -148,15 +126,11 @@ export default function Dashboard() {
                         </div>
                     </div>
 
-                    {/* Строка поиска (отображается для списков и досок) */}
                     {view !== "summary" && (
                         <div className="px-8 py-4 flex items-center gap-3 shrink-0">
                             <div className="relative w-64">
                                 <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
-                                <input
-                                    placeholder={view === "board" ? "Поиск на доске" : "Поиск по задачам"}
-                                    className="w-full bg-muted/30 border text-sm rounded-md pl-8 h-8 outline-none focus:border-blue-500 text-foreground transition-colors"
-                                />
+                                <input placeholder={view === "board" ? "Поиск на доске" : "Поиск по задачам"} className="w-full bg-muted/30 border text-sm rounded-md pl-8 h-8 outline-none focus:border-blue-500 text-foreground transition-colors" />
                             </div>
                             <div className="flex -space-x-2">
                                 <div className="w-8 h-8 rounded-full bg-blue-600 border-2 border-background flex items-center justify-center text-xs text-white font-bold z-10">DK</div>
@@ -166,18 +140,8 @@ export default function Dashboard() {
 
                     <div className={`flex-1 overflow-hidden ${view === "summary" ? "p-8 pt-4" : "px-8 pb-4"}`}>
                         {view === "summary" && <SummaryView />}
-                        {view === "list" && (
-                            <ListView tasks={activeBoard.tasks} onTaskClick={setSelectedTask} />
-                        )}
-                        {view === "board" && (
-                            <KanbanBoard
-                                tasks={activeBoard.tasks}
-                                setTasks={setBoardTasks}
-                                columns={activeBoard.columns}
-                                setColumns={setBoardColumns}
-                                onTaskClick={setSelectedTask}
-                            />
-                        )}
+                        {view === "list" && <ListView tasks={activeBoard.tasks} onTaskClick={setSelectedTask} />}
+                        {view === "board" && <KanbanBoard tasks={activeBoard.tasks} setTasks={setBoardTasks} columns={activeBoard.columns} setColumns={setBoardColumns} onTaskClick={setSelectedTask} />}
                     </div>
                 </main>
             </div>
