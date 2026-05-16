@@ -25,7 +25,9 @@ export const projectsSlice = createAppSlice({
         // Асинхронный reducer (с createAsyncThunk-like поведением)
         fetchProjects: create.asyncThunk(
             async (_, { rejectWithValue }) => {
+                console.log("FETCH PROJECTS");
                 const res = await projectService.getProjectList();
+                console.log("RES", res);
                 if (!res.ok) {
                     return rejectWithValue(res.errors);
                 }

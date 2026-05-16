@@ -1,6 +1,7 @@
 import { myFetch } from "@/shared/lib/myFetch";
 import { Project } from "./Project";
 import { Tag } from "./Tag";
+import { CONSTS } from "@/shared/lib/consts";
 
 export type Pipeline = {
     id: number;
@@ -41,11 +42,11 @@ export type PipelineInfo = {
 class PipelineService {
     private ROUTES = {
         default: (projectId: Project["id"]) =>
-            this.ROUTES + `/projects/${projectId}/pipelines`,
+            CONSTS.API_URL + `/projects/${projectId}/pipelines`,
         id: (projectId: Project["id"], pipelineId: Pipeline["id"]) =>
-            this.ROUTES + `/projects/${projectId}/pipelines/${pipelineId}`,
+            CONSTS.API_URL + `/projects/${projectId}/pipelines/${pipelineId}`,
         board: (pipelineId: Pipeline["id"]) =>
-            this.ROUTES + `/projects/${pipelineId}/board`,
+            CONSTS.API_URL + `/pipelines/${pipelineId}/board`,
     };
     async getList(projectId: Project["id"]) {
         return await myFetch<Pipeline[]>(this.ROUTES.default(projectId), {

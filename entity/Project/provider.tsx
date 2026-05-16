@@ -1,14 +1,14 @@
 "use client";
 
 import { useAppDispatch } from "@/shared/hooks/reduxHooks";
-import { ReactNode, useLayoutEffect } from "react";
+import { ReactNode, useEffect } from "react";
 import { fetchProjects } from "./slice";
 
 export function ProjectsProvider({ children }: { children: ReactNode }) {
     const dispatch = useAppDispatch();
-    useLayoutEffect(() => {
+    useEffect(() => {
         console.log("dispatch fetchProjects");
         dispatch(fetchProjects());
-    }, [dispatch]);
+    }, []);
     return children;
 }

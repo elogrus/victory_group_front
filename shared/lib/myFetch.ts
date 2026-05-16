@@ -2,7 +2,6 @@ interface BaseFetchResult {
     ok: boolean;
     status: number;
     res: Response;
-    errors: string[];
 }
 export interface FetchResultSuccess<T> extends BaseFetchResult {
     ok: true;
@@ -10,7 +9,7 @@ export interface FetchResultSuccess<T> extends BaseFetchResult {
 }
 export interface FetchResultFailure extends BaseFetchResult {
     ok: false;
-    body?: never;
+    errors: string[];
 }
 
 export type FetchResult<T = unknown> =
@@ -27,6 +26,8 @@ export const myFetch = async <T = unknown>(
             ...opts,
             headers: {
                 "Content-Type": "application/json",
+                Authorization:
+                    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc3ODk1NzE4MywiaWQiOjIsIm5hbWUiOiJzdHJpbmcifQ.oEcEFGkblzwZy8cnjYoaSO5zVZj_Mp9Pt9-k_L5z8K4",
                 ...opts?.headers,
             },
             credentials: "include",
@@ -39,12 +40,12 @@ export const myFetch = async <T = unknown>(
         }
 
         if (res.ok) {
+            const body = await res.json();
             const result: FetchResult<T> = {
                 ok: true,
                 status: res.status,
                 res: res,
-                errors: [],
-                body: res.bodyUsed ? await res.json() : null,
+                body: body ?? null,
             };
             return result;
         }
@@ -57,7 +58,6 @@ export const myFetch = async <T = unknown>(
                 ? ((await res.json()) as string[])
                 : ["Произошла какая-то ошибка"],
         };
-
         return result;
     } catch (error) {
         const result: FetchResult<T> = {

@@ -1,3 +1,8 @@
+"use client";
+
+import { ProjectContext } from "@/features/Dashboard/providers/ProjectProvider";
+import useAccurateContext from "@/shared/hooks/useAccurateContext";
+
 export default function ProjectPage() {
-    <div>страница с проектом типа бебе</div>;
+    return <div>asdasd</div>;
 }

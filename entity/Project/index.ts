@@ -19,9 +19,11 @@ class ProjectService {
             CONSTS.API_URL + `/projects/${id}/member/${user_id}`,
     };
     async getProjectList() {
-        return await myFetch<Project[]>(this.ROUTES.default, {
+        const a = await myFetch<Project[]>(this.ROUTES.default, {
             method: "GET",
         });
+        console.log(a);
+        return a;
     }
     async createProject() {}
     async getProject(id: Project["id"]) {

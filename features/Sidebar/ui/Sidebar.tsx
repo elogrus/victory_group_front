@@ -11,12 +11,16 @@ import {
 } from "@/entity/Project/slice";
 import { Spinner } from "@/shared/ui/spinner";
 import Link from "next/link";
+import { Project } from "@/entity/Project";
+import { useParams } from "next/navigation";
 
 export function Sidebar() {
     const [isOpen, setIsOpen] = useState(true);
     const projects = useAppSelector(selectProjects);
     const isLoading = useAppSelector(selectIsLoading);
     const errors = useAppSelector(selectErrors);
+
+    const params = useParams();
 
     return (
         <aside
@@ -44,11 +48,12 @@ export function Sidebar() {
 
             <nav className="p-2 flex-1 flex flex-col gap-1 overflow-y-auto overflow-x-hidden no-scrollbar">
                 {isLoading && <Spinner />}
-                {errors && "Произошла ошибка: " + errors[0]}
+                {errors &&
+                    errors.length !== 0 &&
+                    "Произошла ошибка: " + errors[0]}
                 {projects &&
-                    projects.map((p: any) => {
-                        // const isActive = p.id === activeProjId;
-                        const isActive = p.id === 123;
+                    projects.map((p) => {
+                        const isActive = p.id === Number(params.projectId);
                         return (
                             <Button
                                 key={p.id}
