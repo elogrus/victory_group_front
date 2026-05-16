@@ -1,8 +1,8 @@
 "use client";
 
-import { Header } from "@/components/Header";
-import { ProjectMap } from "@/components/ProjectMap";
-import { CreateTaskModal } from "@/components/CreateTaskModal";
+import { Header } from "@/widgets/Header/Header";
+import { ProjectMap } from "@/widgets/ProjectMap/ProjectMap";
+import { CreateTaskModal } from "@/features/Task/CreateTaskModal";
 import { useState } from "react";
 
 export default function MapPage() {

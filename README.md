@@ -34,3 +34,104 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+```
+victory_group_front
+├─ app
+│  ├─ auth
+│  │  └─ page.tsx
+│  ├─ d
+│  │  ├─ layout.tsx
+│  │  └─ page.tsx
+│  ├─ favicon.ico
+│  ├─ globals.css
+│  ├─ layout.tsx
+│  ├─ map
+│  │  └─ page.tsx
+│  └─ page.tsx
+├─ components
+│  ├─ CreateProjectModal.tsx
+│  ├─ CreateTaskModal.tsx
+│  ├─ Header.tsx
+│  ├─ KanbanBoard.tsx
+│  ├─ ListView.tsx
+│  ├─ ProjectMap.tsx
+│  ├─ Sidebar.tsx
+│  ├─ SummaryView.tsx
+│  ├─ TaskModal.tsx
+│  └─ TaskTable.tsx
+├─ components.json
+├─ debug.log
+├─ entity
+│  ├─ AutomationRule.ts
+│  ├─ Column.ts
+│  ├─ Me.ts
+│  ├─ Notification.ts
+│  ├─ Pipeline.ts
+│  ├─ Project
+│  │  ├─ index.ts
+│  │  ├─ provider.tsx
+│  │  └─ slice.ts
+│  ├─ Role.ts
+│  ├─ Task.ts
+│  ├─ Token.ts
+│  └─ User.ts
+├─ features
+│  ├─ Auth
+│  │  ├─ client
+│  │  │  └─ AuthProvider.tsx
+│  │  ├─ forms
+│  │  │  ├─ AuthForm.tsx
+│  │  │  └─ debug.log
+│  │  └─ server
+│  │     └─ ProtectRoute.ts
+│  └─ Sidebar
+│     └─ useSidebar.ts
+├─ LICENSE
+├─ next.config.ts
+├─ package.json
+├─ pnpm-lock.yaml
+├─ pnpm-workspace.yaml
+├─ postcss.config.mjs
+├─ README.md
+├─ shared
+│  ├─ assets
+│  │  ├─ fulllogo.svg
+│  │  └─ logo.svg
+│  ├─ hooks
+│  │  ├─ reduxHooks.ts
+│  │  └─ useAccurateContext.ts
+│  ├─ lib
+│  │  ├─ consts.ts
+│  │  ├─ createAccurateContext.ts
+│  │  ├─ createAppSlice.ts
+│  │  ├─ data.ts
+│  │  ├─ myFetch.ts
+│  │  └─ utils.ts
+│  ├─ redux
+│  │  ├─ store.ts
+│  │  └─ StoreProvider.tsx
+│  ├─ schemes
+│  │  ├─ emailSchema.ts
+│  │  ├─ passwordSchema.ts
+│  │  ├─ phoneSchema.ts
+│  │  └─ telegramSchema.ts
+│  └─ ui
+│     ├─ avatar.tsx
+│     ├─ badge.tsx
+│     ├─ button.tsx
+│     ├─ card.tsx
+│     ├─ dialog.tsx
+│     ├─ dropdown-menu.tsx
+│     ├─ field.tsx
+│     ├─ input.tsx
+│     ├─ label.tsx
+│     ├─ scroll-area.tsx
+│     ├─ separator.tsx
+│     ├─ sonner.tsx
+│     ├─ spinner.tsx
+│     ├─ table.tsx
+│     └─ tabs.tsx
+└─ tsconfig.json
+
+```
