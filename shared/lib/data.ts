@@ -26,16 +26,38 @@ export interface Board {
     tasks: Task[];
 }
 
+export interface ProjectAssignment {
+    userId: string;
+    roleId: string;
+}
+
 export interface Project {
     id: string;
     name: string;
     boards: Board[];
+    assignments?: ProjectAssignment[]; 
 }
+
+export const MOCK_ROLES = [
+    { id: "role-admin", name: "Admin", color: "bg-red-100 text-red-700 border-red-200" },
+    { id: "role-member", name: "Member", color: "bg-blue-100 text-blue-700 border-blue-200" },
+    { id: "role-viewer", name: "Viewer", color: "bg-green-100 text-green-700 border-green-200" },
+];
+
+export const MOCK_USERS = [
+    { id: "1", login: "diniar", name: "Diniar Karimov", password: "hashed_password", is_super_user: true },
+    { id: "2", login: "alex_m", name: "Alex Middle", password: "hashed_password", is_super_user: false },
+    { id: "3", login: "ivan_j", name: "Ivan Junior", password: "hashed_password", is_super_user: false },
+];
 
 export const INITIAL_PROJECTS: Project[] = [
     {
         id: "proj-1",
         name: "VictoryGroup",
+        assignments: [
+            { userId: "user-1", roleId: "role-admin" },
+            { userId: "user-2", roleId: "role-member" }
+        ],
         boards: [
             {
                 id: "board-1",
