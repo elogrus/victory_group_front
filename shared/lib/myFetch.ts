@@ -43,7 +43,7 @@ export const myFetch = async <T = unknown>(
         ok: res.ok,
         status: res.status,
         res: res,
-        errors: [],
+        errors: res.bodyUsed ? await res.json() : [],
     };
 
     return result;

@@ -60,6 +60,9 @@
     --color-accent-foreground: hsl(var(--accent-foreground));
     --color-border: hsl(var(--border));
     --color-input: hsl(var(--input));
+
+    --color-destructive: #f44336;
+
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);

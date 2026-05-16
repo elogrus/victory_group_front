@@ -1,5 +1,4 @@
 import { AuthForm } from "@/features/Auth/forms/AuthForm";
-import { GalleryVerticalEnd } from "lucide-react";
 import LogoIcon from "@/shared/assets/logo.svg";
 export default function AuthPage() {
     return (
