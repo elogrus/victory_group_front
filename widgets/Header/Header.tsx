@@ -69,7 +69,9 @@ export function Header({ onCreateClick }: { onCreateClick?: () => void }) {
                                     <div className="text-xs text-muted-foreground">mr.dinyar@gmail.com</div>
                                 </div>
                             </div>
-                            <button className="flex items-center gap-3 px-4 py-2 hover:bg-muted text-left text-foreground"><User className="w-4 h-4"/> Профиль</button>
+                            {/* Переход на страницу профиля */}
+                            <button onClick={() => { setMenuOpen(false); router.push('/profile'); }} className="flex items-center gap-3 px-4 py-2 hover:bg-muted text-left text-foreground"><User className="w-4 h-4"/> Профиль</button>
+                            <button className="flex items-center gap-3 px-4 py-2 hover:bg-muted text-left text-foreground"><Settings className="w-4 h-4"/> Настройки аккаунта</button>
                             <button onClick={toggleTheme} className="flex items-center justify-between px-4 py-2 hover:bg-muted text-left text-foreground">
                                 <div className="flex items-center gap-3">{isDark ? <Moon className="w-4 h-4"/> : <Sun className="w-4 h-4"/>} Тема</div>
                                 <span className="text-xs text-muted-foreground">{isDark ? 'Темная' : 'Светлая'}</span>

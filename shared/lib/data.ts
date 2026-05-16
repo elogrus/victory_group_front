@@ -54,7 +54,6 @@ export const INITIAL_PROJECTS: Project[] = [
     }
 ];
 
-// --- ДАННЫЕ ДЛЯ КАРТЫ ПРОЕКТОВ (Проект -> Роль -> Пользователь) ---
 export const PROJECT_HIERARCHY: any = {
     "proj-1": {
         id: "proj-1",
@@ -107,3 +106,24 @@ export const PROJECT_HIERARCHY: any = {
         ]
     }
 };
+
+// --- ДАННЫЕ ПРОФИЛЯ ПОЛЬЗОВАТЕЛЯ ---
+export const MOCK_USER_PROFILE = {
+    name: "Diniar Karimov",
+    email: "mr.dinyar@gmail.com",
+    initials: "DK",
+    avatarUrl: null // если null, показываем initials
+};
+
+export const MOCK_USER_PROJECTS = [
+    { id: "proj-1", name: "VictoryGroup", role: "Admin", roleColor: "bg-blue-100 text-blue-700" },
+    { id: "proj-2", name: "Landing Page", role: "Member", roleColor: "bg-green-100 text-green-700" },
+    { id: "proj-3", name: "Mobile App MVP", role: "Viewer", roleColor: "bg-yellow-100 text-yellow-700" },
+];
+
+export const MOCK_NOTIFICATIONS = [
+    { id: "notif-1", type: "mention", text: "Sam Lee упомянул вас в задаче KAN-4", date: "10 минут назад", isRead: false },
+    { id: "notif-2", type: "system", text: "Вы были добавлены в проект Mobile App MVP", date: "2 часа назад", isRead: false },
+    { id: "notif-3", type: "task", text: "Задача KAN-1 переведена в статус DONE", date: "Вчера", isRead: true },
+    { id: "notif-4", type: "mention", text: "Anna Py ответила на ваш комментарий", date: "Вчера", isRead: true },
+];
