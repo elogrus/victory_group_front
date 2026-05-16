@@ -38,10 +38,39 @@ export interface Project {
     assignments?: ProjectAssignment[]; 
 }
 
-export const MOCK_ROLES = [
-    { id: "role-admin", name: "Admin", color: "bg-red-100 text-red-700 border-red-200" },
-    { id: "role-member", name: "Member", color: "bg-blue-100 text-blue-700 border-blue-200" },
-    { id: "role-viewer", name: "Viewer", color: "bg-green-100 text-green-700 border-green-200" },
+export interface Role {
+    id: string;
+    name: string;
+    can_create_task: boolean;
+    can_update_task: boolean;
+    can_delete_task: boolean;
+    can_manage_members: boolean;
+    can_manage_pipelines: boolean;
+    can_update_project: boolean;
+    can_delete_project: boolean;
+    can_manage_tags: boolean;
+    can_manage_automation: boolean;
+    can_view_analytics: boolean;
+    can_assign_task: boolean;
+}
+
+export const MOCK_ROLES: Role[] = [
+    { 
+        id: "role-admin", 
+        name: "admin", 
+        can_create_task: true, can_update_task: true, can_delete_task: true,
+        can_manage_members: true, can_manage_pipelines: true, can_update_project: true,
+        can_delete_project: true, can_manage_tags: true, can_manage_automation: true,
+        can_view_analytics: true, can_assign_task: true 
+    },
+    { 
+        id: "role-viewer", 
+        name: "viewer", 
+        can_create_task: false, can_update_task: false, can_delete_task: false,
+        can_manage_members: false, can_manage_pipelines: false, can_update_project: false,
+        can_delete_project: false, can_manage_tags: false, can_manage_automation: false,
+        can_view_analytics: true, can_assign_task: false 
+    },
 ];
 
 export const MOCK_USERS = [
