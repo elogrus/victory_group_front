@@ -92,6 +92,39 @@ class AdminService {
             method: "GET",
         });
     }
+
+    private AUTOMATION_ROUTES = {
+        list: (projectId: number | string) => 
+            CONSTS.API_URL + `/projects/${projectId}/automation-rules`,
+        detail: (projectId: number | string, ruleId: number | string) => 
+            CONSTS.API_URL + `/projects/${projectId}/automation-rules/${ruleId}`,
+    };
+
+    async getAutomationRules(projectId: number | string) {
+        return await myFetch<any[]>(this.AUTOMATION_ROUTES.list(projectId));
+    }
+
+    async createAutomationRule(projectId: number | string, data: any) {
+        return await myFetch<any>(this.AUTOMATION_ROUTES.list(projectId), {
+            method: "POST",
+            body: JSON.stringify(data),
+        });
+    }
+
+    async updateAutomationRule(projectId: number | string, ruleId: number | string, data: any) {
+        return await myFetch<any>(this.AUTOMATION_ROUTES.detail(projectId, ruleId), {
+            method: "PATCH",
+            body: JSON.stringify(data),
+        });
+    }
+
+    async deleteAutomationRule(projectId: number | string, ruleId: number | string) {
+        return await myFetch<any>(this.AUTOMATION_ROUTES.detail(projectId, ruleId), {
+            method: "DELETE",
+        });
+    }
 }
+
+
 const adminService = new AdminService();
 export default adminService;

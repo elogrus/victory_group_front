@@ -3,26 +3,28 @@
 import { useState } from "react";
 import { Button } from "@/shared/ui/button";
 import { Dialog, DialogContent } from "@/shared/ui/dialog";
-import { Trash2, X, Plus, BrainCircuit, Loader2, UserMinus } from "lucide-react";
+import { Trash2, X, Plus, BrainCircuit, Loader2 } from "lucide-react";
 import { Project, ProjectMember } from "@/shared/lib/data";
 import { Badge } from "@/shared/ui/badge";
 import { AiAnalyticsDashboard } from "@/features/Analytics/AiAnalyticsDashboard";
-import adminService from "@/entity/Admin"; // Импортируем сервис
+import adminService from "@/entity/Admin"; 
 import { toast } from "sonner";
+import { useRouter } from "next/navigation"; // Импортируем useRouter вместо redirect
 
 export function AdminProjects({ projects, isLoading }: { projects: Project[], isLoading: boolean }) {
+    const router = useRouter(); // Инициализируем роутер
+    
     const [analyticsModalOpen, setAnalyticsModalOpen] = useState(false);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
     const [analyticsData, setAnalyticsData] = useState<any>(null);
     const [isAnalyticsLoading, setIsAnalyticsLoading] = useState(false);
 
-    // Функция получения реальной аналитики с бэкенда
     const handleOpenAnalytics = async (project: Project) => {
         setSelectedProject(project);
         setAnalyticsModalOpen(true);
         setIsAnalyticsLoading(true);
-        setAnalyticsData(null); // Сбрасываем старые данные
-        
+        setAnalyticsData(null);
+
         try {
             const res = await adminService.getProjectAnalytics(project.id);
             if (res?.ok) {
@@ -44,11 +46,15 @@ export function AdminProjects({ projects, isLoading }: { projects: Project[], is
         <div className="space-y-6 relative">
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-bold text-foreground">Управление проектами</h1>
-                <Button className="bg-blue-600 text-white"><Plus className="w-4 h-4 mr-2"/> Создать проект</Button>
+                <Button className="bg-blue-600 text-white">
+                    <Plus className="w-4 h-4 mr-2" /> Создать проект
+                </Button>
             </div>
-            
+
             {isLoading ? (
-                <div className="flex justify-center p-12"><Loader2 className="w-10 h-10 animate-spin text-blue-600" /></div>
+                <div className="flex justify-center p-12">
+                    <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+                </div>
             ) : projects.map((proj: Project) => (
                 <div key={proj.id} className="border rounded-xl bg-card shadow-sm overflow-hidden mb-6 hover:border-blue-500/30 transition-colors">
                     <div className="p-5 flex items-center justify-between border-b bg-muted/10">
@@ -60,20 +66,34 @@ export function AdminProjects({ projects, isLoading }: { projects: Project[], is
                                 <h3 className="font-semibold text-lg">{proj.name}</h3>
                                 <div className="flex gap-3 text-xs text-muted-foreground mt-0.5">
                                     <span>ID: {proj.id}</span>
-                                    {proj.created_at && <span>Создан: {new Date(proj.created_at).toLocaleDateString('ru-RU')}</span>}
+                                    {proj.created_at && (
+                                        <span>Создан: {new Date(proj.created_at).toLocaleDateString('ru-RU')}</span>
+                                    )}
                                 </div>
                             </div>
                         </div>
                         <div className="flex gap-2">
-                            <Button 
-                                variant="outline" 
-                                size="sm" 
-                                className="border-purple-200 text-purple-600 hover:bg-purple-50" 
+                            {/* ИСПРАВЛЕННАЯ КНОПКА АВТОМАТИЗАЦИИ */}
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                                onClick={() => router.push(`/admin/projects/${proj.id}/automation`)}
+                            >
+                                Настроить автоматизацию
+                            </Button>
+
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="border-purple-200 text-purple-600 hover:bg-purple-50"
                                 onClick={() => handleOpenAnalytics(proj)}
                             >
-                                <BrainCircuit className="w-4 h-4 mr-2"/> Аналитика AI
+                                <BrainCircuit className="w-4 h-4 mr-2" /> Аналитика AI
                             </Button>
-                            <Button variant="outline" size="sm" className="text-red-500 hover:bg-red-50"><Trash2 className="w-4 h-4"/></Button>
+                            <Button variant="outline" size="sm" className="text-red-500 hover:bg-red-50">
+                                <Trash2 className="w-4 h-4" />
+                            </Button>
                         </div>
                     </div>
 
@@ -100,7 +120,7 @@ export function AdminProjects({ projects, isLoading }: { projects: Project[], is
                 </div>
             ))}
 
-            {/* --- МОДАЛКА АНАЛИТИКИ --- */}
+            {/* Модалка аналитики остается без изменений */}
             <Dialog open={analyticsModalOpen} onOpenChange={setAnalyticsModalOpen}>
                 <DialogContent className="!max-w-[1200px] w-[90vw] h-[90vh] flex flex-col p-0 overflow-hidden [&>button]:hidden">
                     <div className="p-6 border-b flex justify-between items-center bg-background shrink-0">
@@ -111,9 +131,9 @@ export function AdminProjects({ projects, isLoading }: { projects: Project[], is
                                 <p className="text-sm text-muted-foreground">Проект: {selectedProject?.name}</p>
                             </div>
                         </div>
-                        <Button variant="ghost" size="icon" onClick={() => setAnalyticsModalOpen(false)}><X className="w-5 h-5"/></Button>
+                        <Button variant="ghost" size="icon" onClick={() => setAnalyticsModalOpen(false)}><X className="w-5 h-5" /></Button>
                     </div>
-                    
+
                     <div className="flex-1 overflow-y-auto p-8 bg-muted/5">
                         {isAnalyticsLoading ? (
                             <div className="flex flex-col items-center justify-center h-full gap-4 mt-20">

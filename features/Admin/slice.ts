@@ -14,6 +14,7 @@ interface State {
     users: User[] | null;
     roles: Role[] | null; // <-- Добавили
     errors: string[];
+    automationRules: any[] | null;
 }
 
 const initialState: State = {
@@ -22,6 +23,7 @@ const initialState: State = {
     users: null,
     roles: null,
     errors: [],
+    automationRules: null,
 };
 
 export const adminSlice = createAppSlice({
@@ -150,6 +152,47 @@ export const adminSlice = createAppSlice({
                 }
             }
         ),
+
+        fetchAutomationRules: create.asyncThunk(
+            async (projectId: number | string, { rejectWithValue }) => {
+                const res = await adminService.getAutomationRules(projectId);
+                if (!res.ok) return rejectWithValue(res.errors);
+                return res.body;
+            },
+            {
+                fulfilled: (state, action) => { state.automationRules = action.payload; },
+            }
+        ),
+
+        fetchCreateRule: create.asyncThunk(
+            async (payload: { projectId: number; data: any }, { dispatch }) => {
+                const res = await adminService.createAutomationRule(payload.projectId, payload.data);
+                if (res.ok) {
+                    toast.success("Правило создано");
+                    dispatch(adminSlice.actions.fetchAutomationRules(payload.projectId));
+                }
+            }
+        ),
+
+        fetchUpdateRule: create.asyncThunk(
+            async (payload: { projectId: number; ruleId: number; data: any }, { dispatch }) => {
+                const res = await adminService.updateAutomationRule(payload.projectId, payload.ruleId, payload.data);
+                if (res.ok) {
+                    toast.success("Правило обновлено");
+                    dispatch(adminSlice.actions.fetchAutomationRules(payload.projectId));
+                }
+            }
+        ),
+
+        fetchDeleteRule: create.asyncThunk(
+            async (payload: { projectId: number; ruleId: number }, { dispatch }) => {
+                const res = await adminService.deleteAutomationRule(payload.projectId, payload.ruleId);
+                if (res.ok) {
+                    toast.success("Правило удалено");
+                    dispatch(adminSlice.actions.fetchAutomationRules(payload.projectId));
+                }
+            }
+        ),
     }),
 });
 
@@ -163,5 +206,9 @@ export const {
     fetchSetSuperuser,
     fetchCreateRole,
     fetchUpdateRole,
-    fetchDeleteRole
+    fetchDeleteRole,
+    fetchAutomationRules,
+    fetchCreateRule,
+    fetchDeleteRule,
+    fetchUpdateRule
 } = adminSlice.actions;
