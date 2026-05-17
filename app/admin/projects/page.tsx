@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AdminProjects } from "@/features/Admin/AdminProjects";
+import { AdminProjects } from "@/features/Admin/ui/AdminProjects";
 import { INITIAL_PROJECTS, MOCK_USERS, MOCK_ROLES } from "@/shared/lib/data";
 
 export default function AdminProjectsPage() {
@@ -11,11 +11,11 @@ export default function AdminProjectsPage() {
 
     return (
         <div className="animate-in fade-in duration-500">
-            <AdminProjects 
-                projects={projects} 
-                setProjects={setProjects} 
-                users={users} 
-                roles={roles} 
+            <AdminProjects
+                projects={projects}
+                setProjects={setProjects}
+                users={users}
+                roles={roles}
             />
         </div>
     );

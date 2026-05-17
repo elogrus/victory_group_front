@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AdminRoles } from "@/features/Admin/AdminRoles";
+import { AdminRoles } from "@/features/Admin/ui/AdminRoles";
 import { MOCK_ROLES } from "@/shared/lib/data";
 
 export default function AdminRolesPage() {
@@ -9,10 +9,7 @@ export default function AdminRolesPage() {
 
     return (
         <div className="animate-in fade-in duration-500">
-            <AdminRoles 
-                roles={roles} 
-                setRoles={setRoles} 
-            />
+            <AdminRoles roles={roles} setRoles={setRoles} />
         </div>
     );
 }
