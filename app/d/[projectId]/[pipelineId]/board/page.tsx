@@ -17,7 +17,7 @@ export default function Board() {
                     <Button
                         onClick={async () => {
                             console.log("start loading");
-                            dispatch(
+                            await dispatch(
                                 modifyColumn({
                                     columnId: c.id,
                                     pipelineId: c.pipeline_id,
