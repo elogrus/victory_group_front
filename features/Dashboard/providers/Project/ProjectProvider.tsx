@@ -13,21 +13,6 @@ export function ProjectProvider({
     projectId: Project["id"];
     children: ReactNode;
 }) {
-    const memoProjectId = useMemo(() => projectId, [projectId]);
-    // const { sendMessage, lastMessage, connectionStatus } = useWebSocket(
-    //     `${CONSTS.API_URL}/ws/${memoProjectId}`,
-    //     {
-    //         shouldReconnect: false,
-    //         // reconnectAttempts: 5,
-    //         // reconnectInterval: 3000,
-    //         onOpen: () => console.log("Connected!"),
-    //         onClose: (event) => {
-    //             if (!event.wasClean) {
-    //                 console.log("Connection lost, attempting to reconnect...");
-    //             }
-    //         },
-    //     },
-    // );
     console.log("rerender ProjectProvider");
     const dispatch = useAppDispatch();
     useEffect(() => {

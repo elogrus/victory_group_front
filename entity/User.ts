@@ -2,6 +2,7 @@ export type User = {
     id: number;
     name: string;
     login: string;
+    is_superuser: boolean;
     is_active: boolean;
 };
 
