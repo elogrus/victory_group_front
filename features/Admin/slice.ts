@@ -3,13 +3,16 @@
 import adminService from "@/entity/Admin";
 import { Project } from "@/entity/Project";
 import { User } from "@/entity/User";
+import { Role } from "@/shared/lib/data";
 import { createAppSlice } from "@/shared/lib/createAppSlice";
 import { PayloadAction } from "@reduxjs/toolkit";
+import { toast } from "sonner";
 
 interface State {
     isLoading: boolean;
     projects: Project[] | null;
     users: User[] | null;
+    roles: Role[] | null; // <-- Добавили
     errors: string[];
 }
 
@@ -17,10 +20,10 @@ const initialState: State = {
     isLoading: false,
     projects: null,
     users: null,
+    roles: null,
     errors: [],
 };
 
-// Изменили имя на adminSlice и name на "admin"
 export const adminSlice = createAppSlice({
     name: "admin", 
     initialState,
@@ -28,6 +31,7 @@ export const adminSlice = createAppSlice({
         clear: create.reducer((state) => {
             state.projects = null;
             state.users = null;
+            state.roles = null;
             state.errors = [];
         }),
 
@@ -69,35 +73,81 @@ export const adminSlice = createAppSlice({
             }
         ),
 
-        setActivation: create.reducer(
-            (state, action: PayloadAction<{ user_id: User["id"]; activation: boolean }>) => {
-                if (!state.users) return;
-                const user = state.users.find((u) => u.id === action.payload.user_id);
-                if (user) user.is_active = action.payload.activation;
+        fetchRoles: create.asyncThunk(
+            async (_, { rejectWithValue }) => {
+                const res = await adminService.getRoles();
+                if (!res.ok) return rejectWithValue(res.errors);
+                return res.body;
+            },
+            {
+                fulfilled: (state, action) => {
+                    state.roles = action.payload;
+                }
+            }
+        ),
+
+        fetchRegisterUser: create.asyncThunk(
+            async (data: any, { dispatch }) => {
+                const res = await adminService.registerUser(data);
+                if (res.ok) {
+                    toast.success("Пользователь зарегистрирован");
+                    dispatch(adminSlice.actions.fetchUsers());
+                } else {
+                    toast.error(res.errors[0] || "Ошибка регистрации");
+                }
+                return res.ok;
             }
         ),
 
         fetchSetActivation: create.asyncThunk(
-            async (payload: { user_id: User["id"]; activation: boolean }, { dispatch }) => {
+            async (payload: { user_id: number; activation: boolean }, { dispatch }) => {
                 const res = payload.activation
                     ? await adminService.activateUser(payload.user_id)
                     : await adminService.deactivateUser(payload.user_id);
-                if (res.ok) dispatch(adminSlice.actions.setActivation(payload));
-            }
-        ),
-
-        setSuperuser: create.reducer(
-            (state, action: PayloadAction<{ user_id: User["id"]; activation: boolean }>) => {
-                if (!state.users) return;
-                const user = state.users.find((u) => u.id === action.payload.user_id);
-                if (user) user.is_superuser = action.payload.activation;
+                if (res.ok) {
+                    toast.success(payload.activation ? "Пользователь активирован" : "Пользователь деактивирован");
+                    dispatch(adminSlice.actions.fetchUsers());
+                }
             }
         ),
 
         fetchSetSuperuser: create.asyncThunk(
-            async (payload: { user_id: User["id"]; activation: boolean }, { dispatch }) => {
+            async (payload: { user_id: number; activation: boolean }, { dispatch }) => {
                 const res = await adminService.setSuperuser(payload.user_id, payload.activation);
-                if (res.ok) dispatch(adminSlice.actions.setSuperuser(payload));
+                if (res.ok) {
+                    toast.success("Права изменены");
+                    dispatch(adminSlice.actions.fetchUsers());
+                }
+            }
+        ),
+
+        fetchCreateRole: create.asyncThunk(
+            async (data: any, { dispatch }) => {
+                const res = await adminService.createRole(data);
+                if (res.ok) {
+                    toast.success("Роль создана");
+                    dispatch(adminSlice.actions.fetchRoles());
+                }
+            }
+        ),
+
+        fetchUpdateRole: create.asyncThunk(
+            async (payload: { id: any, data: any }, { dispatch }) => {
+                const res = await adminService.updateRole(payload.id, payload.data);
+                if (res.ok) {
+                    toast.success("Роль обновлена");
+                    dispatch(adminSlice.actions.fetchRoles());
+                }
+            }
+        ),
+
+        fetchDeleteRole: create.asyncThunk(
+            async (id: any, { dispatch }) => {
+                const res = await adminService.deleteRole(id);
+                if (res.ok) {
+                    toast.success("Роль удалена");
+                    dispatch(adminSlice.actions.fetchRoles());
+                }
             }
         ),
     }),
@@ -107,6 +157,11 @@ export const {
     clear,
     fetchProjects,
     fetchUsers,
+    fetchRoles,
+    fetchRegisterUser,
     fetchSetActivation,
     fetchSetSuperuser,
+    fetchCreateRole,
+    fetchUpdateRole,
+    fetchDeleteRole
 } = adminSlice.actions;
