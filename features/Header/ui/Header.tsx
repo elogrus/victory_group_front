@@ -9,7 +9,7 @@ import { MOCK_NOTIFICATIONS } from "@/shared/lib/data";
 export function Header({ onCreateClick }: { onCreateClick?: () => void }) {
     const router = useRouter();
     const pathname = usePathname();
-    
+
     const [menuOpen, setMenuOpen] = useState(false);
     const [notifOpen, setNotifOpen] = useState(false);
     const [isDark, setIsDark] = useState(true);
@@ -40,11 +40,11 @@ export function Header({ onCreateClick }: { onCreateClick?: () => void }) {
     return (
         <header className="h-14 border-b flex items-center justify-between px-4 bg-background shrink-0 relative z-50 shadow-sm">
             <div className="flex items-center gap-4">
-                <svg 
-                    onClick={() => router.push('/')} 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    viewBox="0 0 56 42" 
-                    fill="none" 
+                <svg
+                    onClick={() => router.push('/')}
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 56 42"
+                    fill="none"
                     className="w-9 h-auto cursor-pointer text-blue-600 shrink-0 ml-2"
                 >
                     <path d="M56.3462 14.7422L26.9231 42V27.2578L56.3462 0V14.7422Z" className="symbol" fill="currentColor"></path>
@@ -53,7 +53,7 @@ export function Header({ onCreateClick }: { onCreateClick?: () => void }) {
 
                 <nav className="hidden xl:flex gap-5 ml-6 text-sm font-medium items-center">
                     <button
-                        onClick={() => router.push('/')}
+                        onClick={() => router.push('/d')}
                         className={`whitespace-nowrap transition-colors ${pathname === '/' ? 'text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'}`}
                     >
                         Проекты
@@ -73,9 +73,12 @@ export function Header({ onCreateClick }: { onCreateClick?: () => void }) {
                         Админ-панель
                     </button>
 
-                    <Button size="sm" className="ml-2 bg-blue-600 hover:bg-blue-700 text-white whitespace-nowrap" onClick={onCreateClick}>
-                        Создать
-                    </Button>
+                    {
+                        onCreateClick &&
+                        <Button size="sm" className="ml-2 bg-blue-600 hover:bg-blue-700 text-white whitespace-nowrap" onClick={onCreateClick}>
+                            Создать
+                        </Button>
+                    }
                 </nav>
             </div>
 
@@ -92,7 +95,7 @@ export function Header({ onCreateClick }: { onCreateClick?: () => void }) {
                             <span className="absolute top-1 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-background"></span>
                         )}
                     </Button>
-                    
+
                     {notifOpen && (
                         <div className="absolute right-0 top-10 w-80 bg-popover border rounded-md shadow-lg py-2 flex flex-col z-50">
                             <div className="px-4 py-2 border-b flex justify-between items-center">
@@ -122,7 +125,7 @@ export function Header({ onCreateClick }: { onCreateClick?: () => void }) {
                 <Button variant="ghost" size="icon" className="text-muted-foreground w-8 h-8" onClick={() => router.push('/onboarding')}>
                     <HelpCircle className="w-5 h-5" />
                 </Button>
-                
+
                 <Button variant="ghost" size="icon" className="text-muted-foreground w-8 h-8"><Settings className="w-5 h-5" /></Button>
 
                 <div className="relative" ref={userMenuRef}>

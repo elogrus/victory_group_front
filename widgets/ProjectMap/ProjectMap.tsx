@@ -38,7 +38,6 @@ const CustomNode = ({ data }: NodeProps) => {
                     
                     <div>
                         <div className="font-bold text-foreground text-sm">{data.label as string}</div>
-                        {data.email && <div className="text-xs text-muted-foreground">{data.email as string}</div>}
                     </div>
                 </div>
 
