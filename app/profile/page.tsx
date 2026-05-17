@@ -1,6 +1,6 @@
 "use client";
 
-import { Header } from "@/widgets/Header/Header";
+import { Header } from "@/features/Header/ui/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import { Camera, Lock, FolderDot, Bell, ExternalLink, AtSign } from "lucide-react";

@@ -1,6 +1,6 @@
 "use client";
 
-import { Header } from "@/widgets/Header/Header";
+import { Header } from "@/features/Header/ui/Header";
 import { ProjectMap } from "@/widgets/ProjectMap/ProjectMap";
 import { CreateTaskModal } from "@/features/Dashboard/ui/CreateTaskModal";
 import { useState } from "react";

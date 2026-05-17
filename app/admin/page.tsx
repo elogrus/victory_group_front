@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Header } from "@/widgets/Header/Header";
+import { Header } from "@/features/Header/ui/Header";
 import { FolderDot, Users, Shield, BrainCircuit } from "lucide-react";
 import { INITIAL_PROJECTS, MOCK_USERS, MOCK_ROLES, Project } from "@/shared/lib/data";
 import { MOCK_ANALYTICS_DATA } from "@/shared/lib/mock-analytics";

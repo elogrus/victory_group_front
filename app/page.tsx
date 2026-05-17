@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Header } from "@/widgets/Header/Header";
+import { Header } from "@/features/Header/ui/Header";
 import { Sidebar } from "@/features/Sidebar/ui/Sidebar";
 import { KanbanBoard } from "@/widgets/KanbanBoard/KanbanBoard";
 import { ListView } from "@/entity/Task/ui/ListView";

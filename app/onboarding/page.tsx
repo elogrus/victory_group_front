@@ -1,6 +1,6 @@
 "use client";
 
-import { Header } from "@/widgets/Header/Header";
+import { Header } from "@/features/Header/ui/Header";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Info, Layout, CheckSquare, BarChart2, Map, Bell } from "lucide-react";
 import { Button } from "@/shared/ui/button";
