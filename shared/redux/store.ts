@@ -1,4 +1,5 @@
 import { projectsSlice } from "@/entity/Project/slice";
+import { adminSlice } from "@/features/Admin/slice";
 import { pipelineSlice } from "@/features/Dashboard/providers/Pipeline/slice";
 import { projectSlice } from "@/features/Dashboard/providers/Project/slice";
 import type { Action, ThunkAction } from "@reduxjs/toolkit";
@@ -6,7 +7,12 @@ import { combineSlices, configureStore } from "@reduxjs/toolkit";
 
 // `combineSlices` automatically combines the reducers using
 // their `reducerPath`s, therefore we no longer need to call `combineReducers`.
-const rootReducer = combineSlices(projectsSlice, projectSlice, pipelineSlice);
+const rootReducer = combineSlices(
+    projectsSlice,
+    projectSlice,
+    pipelineSlice,
+    adminSlice,
+);
 
 // Infer the `RootState` type from the root reducer
 export type RootState = ReturnType<typeof rootReducer>;

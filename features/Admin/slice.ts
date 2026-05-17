@@ -7,21 +7,27 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { Users } from "lucide-react";
 
 interface State {
-    isLoading: boolean;
+    isLoading: {
+        projects: boolean;
+        users: boolean;
+    };
     projects: Project[] | null;
     users: User[] | null;
     errors: string[];
 }
 
 const initialState: State = {
-    isLoading: false,
+    isLoading: {
+        projects: false,
+        users: false,
+    },
     projects: null,
     users: null,
     errors: [],
 };
 
-export const projectSlice = createAppSlice({
-    name: "project",
+export const adminSlice = createAppSlice({
+    name: "admin",
     initialState,
     reducers: (create) => ({
         clear: create.reducer((state) => {
@@ -39,14 +45,14 @@ export const projectSlice = createAppSlice({
             },
             {
                 pending: (state) => {
-                    state.isLoading = true;
+                    state.isLoading.projects = true;
                 },
                 fulfilled: (state, action) => {
-                    state.isLoading = false;
+                    state.isLoading.projects = false;
                     state.projects = action.payload;
                 },
                 rejected: (state, action) => {
-                    state.isLoading = false;
+                    state.isLoading.projects = false;
                     state.errors = action.payload as string[];
                 },
             },
@@ -62,14 +68,14 @@ export const projectSlice = createAppSlice({
             },
             {
                 pending: (state) => {
-                    state.isLoading = true;
+                    state.isLoading.users = true;
                 },
                 fulfilled: (state, action) => {
-                    state.isLoading = false;
+                    state.isLoading.users = false;
                     state.users = action.payload;
                 },
                 rejected: (state, action) => {
-                    state.isLoading = false;
+                    state.isLoading.users = false;
                     state.errors = action.payload as string[];
                 },
             },
@@ -156,4 +162,4 @@ export const {
     fetchSetActivation,
     setSuperuser,
     fetchSetSuperuser,
-} = projectSlice.actions;
+} = adminSlice.actions;

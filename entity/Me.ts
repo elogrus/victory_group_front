@@ -15,7 +15,7 @@ class MeService {
             },
         );
         if (res.ok) {
-            tokenService.saveToken(res.body.access_token);
+            tokenService.setToken(res.body.access_token);
         }
         return res;
     }
