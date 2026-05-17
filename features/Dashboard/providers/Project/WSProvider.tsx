@@ -4,10 +4,8 @@ import { Project } from "@/entity/Project";
 import tokenService from "@/entity/Token";
 import { useAppDispatch } from "@/shared/hooks/reduxHooks";
 import { CONSTS } from "@/shared/lib/consts";
-import { ReactNode, useEffect, useRef, useState } from "react";
-import { addTask, modifyTask, removeTask } from "../Pipeline/slice";
-import { Task } from "@/entity/Task";
-import { Column } from "@/entity/Column";
+import { ReactNode, useEffect, useRef } from "react";
+import { addTask } from "../Pipeline/slice";
 
 export function WSProvider({
     children,
@@ -18,74 +16,48 @@ export function WSProvider({
 }) {
     const wsRef = useRef<WebSocket | null>(null);
     const dispatch = useAppDispatch();
+
     useEffect(() => {
-        // Инициализация только на клиенте
+        // Защита: не запускаем WS, если нет projectId
+        if (!projectId) return;
+
+        const token = tokenService.getToken();
+        // Если токена нет, WS не подключаем
+        if (!token) return;
+
         const ws = new WebSocket(CONSTS.API_WS_URL + `/ws/${projectId}`);
         wsRef.current = ws;
 
         ws.onopen = () => {
             console.log("WebSocket connected");
-            const token = tokenService.getToken();
-            if (token) {
-                ws.send(token);
-            }
+            // Отправляем токен для аутентификации в WS
+            ws.send(token);
         };
 
         ws.onmessage = (event) => {
-            const body = JSON.parse(event.data);
-            const type = body.event;
-            const data = body.data;
-            console.log("Received:", event);
-            switch (type) {
-                case "task_created": {
-                    const task = data;
-                    console.log("создание", task);
-                    dispatch(addTask(task));
-                    break;
+            try {
+                const data = JSON.parse(event.data);
+                console.log("WS Received:", data);
+                
+                // В зависимости от формата твоего бэкенда
+                if (data.type === "task_created") {
+                    dispatch(addTask({ 
+                        columnId: data.task.column_id, 
+                        newTask: data.task 
+                    }));
                 }
-
-                case "task_updated": {
-                    const task = data;
-                    dispatch(modifyTask(task));
-                    break;
-                }
-
-                case "task_deleted": {
-                    const {
-                        task_id,
-                        column_id,
-                    }: {
-                        task_id: Task["id"];
-                        column_id: Column["id"];
-                        project_id: Project["id"];
-                    } = data;
-                    dispatch(
-                        removeTask({
-                            taskId: task_id,
-                            columnId: column_id,
-                        }),
-                    );
-                    break;
-                }
-
-                default:
-                    console.warn("Необузданный event", type);
-                    break;
+            } catch (e) {
+                console.error("WS message parse error:", e);
             }
         };
 
-        ws.onclose = () => {
-            console.log("WebSocket disconnected");
-        };
-
-        ws.onerror = (error) => {
-            console.error("WebSocket error:", error);
-        };
+        ws.onclose = () => console.log("WebSocket disconnected");
+        ws.onerror = (error) => console.error("WebSocket error:", error);
 
         return () => {
             ws.close();
         };
-    }, []);
+    }, [projectId, dispatch]);
 
     return children;
 }
