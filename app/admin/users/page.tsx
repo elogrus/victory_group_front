@@ -1,19 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useAppSelector } from "@/shared/hooks/reduxHooks";
 import { AdminUsers } from "@/features/Admin/ui/AdminUsers";
-import { MOCK_USERS, INITIAL_PROJECTS } from "@/shared/lib/data";
 
 export default function AdminUsersPage() {
-    const [users, setUsers] = useState(MOCK_USERS);
-    const [projects, setProjects] = useState(INITIAL_PROJECTS);
+    // В твоем slice name: "project", поэтому обращаемся к state.project
+    const users = useAppSelector((state) => state.project.users);
+    const isLoading = useAppSelector((state) => state.project.isLoading);
 
     return (
         <div className="animate-in fade-in duration-500">
             <AdminUsers
-                users={users}
-                setUsers={setUsers}
-                setProjects={setProjects}
+                users={users || []}
+                isLoading={isLoading}
             />
         </div>
     );

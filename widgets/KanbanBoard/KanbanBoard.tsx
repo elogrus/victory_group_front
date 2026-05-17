@@ -114,7 +114,6 @@ export function KanbanBoard({ columns = [], onTaskClick, updateColumn, deleteCol
 
         if (activeType === "Task") {
             const task = active.data.current.task;
-            // Ищем ID колонки: либо это ID самого over, либо это ID колонки, в которой лежит задача over
             const targetColId = columns.find((c: any) => c.id === over.id)?.id || 
                                 columns.find((c: any) => c.tasks?.some((t: any) => t.id === over.id))?.id;
             

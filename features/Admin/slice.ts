@@ -1,10 +1,10 @@
+"use client";
+
 import adminService from "@/entity/Admin";
-import pipelineService, { Pipeline } from "@/entity/Pipeline";
 import { Project } from "@/entity/Project";
 import { User } from "@/entity/User";
 import { createAppSlice } from "@/shared/lib/createAppSlice";
 import { PayloadAction } from "@reduxjs/toolkit";
-import { Users } from "lucide-react";
 
 interface State {
     isLoading: boolean;
@@ -20,27 +20,25 @@ const initialState: State = {
     errors: [],
 };
 
-export const projectSlice = createAppSlice({
-    name: "project",
+// Изменили имя на adminSlice и name на "admin"
+export const adminSlice = createAppSlice({
+    name: "admin", 
     initialState,
     reducers: (create) => ({
         clear: create.reducer((state) => {
             state.projects = null;
+            state.users = null;
             state.errors = [];
         }),
 
         fetchProjects: create.asyncThunk(
             async (_, { rejectWithValue }) => {
                 const res = await adminService.getProjects();
-                if (!res.ok) {
-                    return rejectWithValue(res.errors);
-                }
+                if (!res.ok) return rejectWithValue(res.errors);
                 return res.body;
             },
             {
-                pending: (state) => {
-                    state.isLoading = true;
-                },
+                pending: (state) => { state.isLoading = true; },
                 fulfilled: (state, action) => {
                     state.isLoading = false;
                     state.projects = action.payload;
@@ -49,21 +47,17 @@ export const projectSlice = createAppSlice({
                     state.isLoading = false;
                     state.errors = action.payload as string[];
                 },
-            },
+            }
         ),
 
         fetchUsers: create.asyncThunk(
             async (_, { rejectWithValue }) => {
                 const res = await adminService.getUsers();
-                if (!res.ok) {
-                    return rejectWithValue(res.errors);
-                }
+                if (!res.ok) return rejectWithValue(res.errors);
                 return res.body;
             },
             {
-                pending: (state) => {
-                    state.isLoading = true;
-                },
+                pending: (state) => { state.isLoading = true; },
                 fulfilled: (state, action) => {
                     state.isLoading = false;
                     state.users = action.payload;
@@ -72,78 +66,39 @@ export const projectSlice = createAppSlice({
                     state.isLoading = false;
                     state.errors = action.payload as string[];
                 },
-            },
+            }
         ),
 
         setActivation: create.reducer(
-            (
-                state,
-                action: PayloadAction<{
-                    user_id: User["id"];
-                    activation: boolean;
-                }>,
-            ) => {
+            (state, action: PayloadAction<{ user_id: User["id"]; activation: boolean }>) => {
                 if (!state.users) return;
-                const { user_id, activation } = action.payload;
-                const user = state.users.find((u) => u.id === user_id);
-                if (!user) return;
-                user.is_active = activation;
-            },
+                const user = state.users.find((u) => u.id === action.payload.user_id);
+                if (user) user.is_active = action.payload.activation;
+            }
         ),
 
         fetchSetActivation: create.asyncThunk(
-            async (
-                payload: {
-                    user_id: User["id"];
-                    activation: boolean;
-                },
-                { dispatch },
-            ) => {
-                const { user_id, activation } = payload;
-                const res = activation
-                    ? await adminService.activateUser(user_id)
-                    : await adminService.deactivateUser(user_id);
-                if (!res.ok) {
-                    return;
-                }
-                dispatch(setActivation({ user_id, activation }));
-            },
+            async (payload: { user_id: User["id"]; activation: boolean }, { dispatch }) => {
+                const res = payload.activation
+                    ? await adminService.activateUser(payload.user_id)
+                    : await adminService.deactivateUser(payload.user_id);
+                if (res.ok) dispatch(adminSlice.actions.setActivation(payload));
+            }
         ),
 
         setSuperuser: create.reducer(
-            (
-                state,
-                action: PayloadAction<{
-                    user_id: User["id"];
-                    activation: boolean;
-                }>,
-            ) => {
+            (state, action: PayloadAction<{ user_id: User["id"]; activation: boolean }>) => {
                 if (!state.users) return;
-                const { user_id, activation } = action.payload;
-                const user = state.users.find((u) => u.id === user_id);
-                if (!user) return;
-                user.is_superuser = activation;
-            },
+                const user = state.users.find((u) => u.id === action.payload.user_id);
+                if (user) user.is_superuser = action.payload.activation;
+            }
         ),
 
         fetchSetSuperuser: create.asyncThunk(
-            async (
-                payload: {
-                    user_id: User["id"];
-                    activation: boolean;
-                },
-                { dispatch },
-            ) => {
-                const { user_id, activation } = payload;
-                const res = await adminService.setSuperuser(
-                    user_id,
-                    activation,
-                );
-                if (!res.ok) {
-                    return;
-                }
-                dispatch(setSuperuser({ user_id, activation }));
-            },
+            async (payload: { user_id: User["id"]; activation: boolean }, { dispatch }) => {
+                const res = await adminService.setSuperuser(payload.user_id, payload.activation);
+                if (res.ok) dispatch(adminSlice.actions.setSuperuser(payload));
+            }
         ),
     }),
 });
@@ -152,8 +107,6 @@ export const {
     clear,
     fetchProjects,
     fetchUsers,
-    setActivation,
     fetchSetActivation,
-    setSuperuser,
     fetchSetSuperuser,
-} = projectSlice.actions;
+} = adminSlice.actions;
