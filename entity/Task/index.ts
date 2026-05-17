@@ -4,6 +4,7 @@ import { Project } from "../Project";
 import { User } from "../User";
 import { CONSTS } from "@/shared/lib/consts";
 import { Tag } from "../Tag";
+import { Column } from "../Column";
 
 export type Task = {
     id: number;
@@ -79,7 +80,23 @@ class TaskService {
             },
         );
     }
-    async move(projectId: Project["id"], taskId: Task["id"]) {}
+    async move(
+        projectId: Project["id"],
+        taskId: Task["id"],
+        columnId: Column["id"],
+        order: number,
+    ) {
+        return await myFetch<{ detail: string }>(
+            this.ROUTES.task_id(projectId, taskId) + "/move",
+            {
+                method: "PATCH",
+                body: JSON.stringify({
+                    column_id: columnId,
+                    order: order,
+                }),
+            },
+        );
+    }
     async addAssigne(
         projectId: Project["id"],
         taskId: Task["id"],
