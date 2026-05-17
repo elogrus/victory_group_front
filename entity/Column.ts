@@ -21,7 +21,15 @@ class ColumnService {
             method: "GET",
         });
     }
-    async create(pipelineId: Pipeline["id"]) {}
+    async create(pipelineId: Pipeline["id"], fields: Omit<Column, "id">) {
+        return await myFetch<{
+            detail: string;
+            column: Column;
+        }>(this.ROUTES.default(pipelineId), {
+            method: "POST",
+            body: JSON.stringify(fields),
+        });
+    }
     async update(
         pipelineId: Pipeline["id"],
         columnId: Column["id"],
@@ -35,7 +43,13 @@ class ColumnService {
             body: JSON.stringify(fields),
         });
     }
-    async delete(pipelineId: Pipeline["id"], columnId: Column["id"]) {}
+    async delete(pipelineId: Pipeline["id"], columnId: Column["id"]) {
+        return await myFetch<{
+            detail: string;
+        }>(this.ROUTES.column_id(pipelineId, columnId), {
+            method: "DELETE",
+        });
+    }
 }
 const columnService = new ColumnService();
 export default columnService;

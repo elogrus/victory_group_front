@@ -55,6 +55,43 @@ export const pipelineSlice = createAppSlice({
             },
         ),
 
+        createColumn: create.asyncThunk(
+            async (
+                payload: {
+                    pipelineId: Pipeline["id"];
+                    columnFields: Omit<Column, "id">;
+                },
+                { rejectWithValue },
+            ) => {
+                const { pipelineId, columnFields } = payload;
+
+                const res = await columnService.create(
+                    pipelineId,
+                    columnFields,
+                );
+                if (!res.ok) {
+                    return rejectWithValue(res.errors);
+                }
+
+                return { pipelineId, newColumn: res.body.column };
+            },
+            {
+                fulfilled: (state, action) => {
+                    if (!state.pipelineInfo) return;
+                    const { pipelineId, newColumn } = action.payload;
+                    state.pipelineInfo.columns = [
+                        ...state.pipelineInfo.columns,
+                        { ...newColumn, pipeline_id: pipelineId, tasks: [] },
+                    ];
+                },
+                rejected: (state, action) => {
+                    toast.error(
+                        state.errors[0] ??
+                            "Произошла ошибка при создании колонки",
+                    );
+                },
+            },
+        ),
         modifyColumn: create.asyncThunk(
             async (
                 payload: {
@@ -98,6 +135,103 @@ export const pipelineSlice = createAppSlice({
                 },
             },
         ),
+        removeColumn: create.asyncThunk(
+            async (
+                payload: {
+                    pipelineId: Pipeline["id"];
+                    columnId: Column["id"];
+                },
+                { rejectWithValue },
+            ) => {
+                const { pipelineId, columnId } = payload;
+
+                const res = await columnService.delete(pipelineId, columnId);
+                if (!res.ok) {
+                    return rejectWithValue(res.errors);
+                }
+
+                return { pipelineId, columnId };
+            },
+            {
+                fulfilled: (state, action) => {
+                    if (!state.pipelineInfo) return;
+                    const { pipelineId, columnId } = action.payload;
+                    state.pipelineInfo.columns =
+                        state.pipelineInfo.columns.filter(
+                            (c) => c.id !== columnId,
+                        );
+                },
+                rejected: (state, action) => {
+                    toast.error(
+                        state.errors[0] ??
+                            "Произошла ошибка при удалении колонки",
+                    );
+                },
+            },
+        ),
+
+        sendCreateTask: create.asyncThunk(
+            async (
+                payload: {
+                    projectId: Project["id"];
+                    pipelineId: Pipeline["id"];
+                    columnId: Column["id"];
+                    taskFields: Partial<Task>;
+                },
+                { rejectWithValue },
+            ) => {
+                const { projectId, pipelineId, columnId, taskFields } = payload;
+
+                const res = await taskService.create(
+                    projectId,
+                    pipelineId,
+                    taskFields,
+                );
+                if (!res.ok) {
+                    return rejectWithValue(res.errors);
+                }
+
+                return {
+                    projectId,
+                    pipelineId,
+                    columnId,
+                };
+            },
+            {
+                fulfilled: (state, action) => {
+                    if (!state.pipelineInfo) return;
+                    const { projectId, columnId } = action.payload;
+                    const column = state.pipelineInfo.columns.find(
+                        (col) => col.id === columnId,
+                    );
+                    if (!column) return;
+                },
+                rejected: (state, action) => {
+                    toast.error(
+                        state.errors[0] ??
+                            "Произошла ошибка при создании задачи",
+                    );
+                },
+            },
+        ),
+        addTask: create.reducer(
+            (
+                state,
+                action: PayloadAction<{
+                    columnId: Column["id"];
+                    newTask: Task;
+                }>,
+            ) => {
+                const { columnId, newTask } = action.payload;
+                if (!state.pipelineInfo) return;
+                const column = state.pipelineInfo.columns.find(
+                    (col) => col.id === columnId,
+                );
+                if (!column) return;
+
+                column.tasks = [...column.tasks, newTask];
+            },
+        ),
 
         modifyTask: create.asyncThunk(
             async (
@@ -137,12 +271,12 @@ export const pipelineSlice = createAppSlice({
                     );
                     if (!column) return;
 
-                    const taskIindex = column.tasks.findIndex(
+                    const taskIndex = column.tasks.findIndex(
                         (t) => t.id === taskId,
                     );
-                    if (taskIindex === -1) return;
-                    column.tasks[taskIindex] = {
-                        ...column.tasks[taskIindex],
+                    if (taskIndex === -1) return;
+                    column.tasks[taskIndex] = {
+                        ...column.tasks[taskIndex],
                         ...newTask,
                     };
                 },
@@ -154,32 +288,47 @@ export const pipelineSlice = createAppSlice({
                 },
             },
         ),
+        removeTask: create.asyncThunk(
+            async (
+                payload: {
+                    projectId: Project["id"];
+                    columnId: Column["id"];
+                    taskId: Task["id"];
+                },
+                { rejectWithValue },
+            ) => {
+                const { projectId, columnId, taskId } = payload;
 
-        // modifyTask: create.reducer(
-        //     (
-        //         state,
-        //         action: PayloadAction<{
-        //             columnId: Column["id"];
-        //             taskId: Task["id"];
-        //             taskFields: Partial<Task>;
-        //         }>,
-        //     ) => {
-        //         const { columnId, taskId, taskFields } = action.payload;
-        //         if (!state.pipelineInfo) return;
-        //         const column = state.pipelineInfo.columns.find(
-        //             (col) => col.id === columnId,
-        //         );
-        //         if (!column) return;
-        //         const taskIndex = column?.tasks.findIndex(
-        //             (t) => t.id === taskId,
-        //         );
-        //         if (taskIndex === -1) return;
-        //         column.tasks[taskIndex] = {
-        //             ...column.tasks[taskIndex],
-        //             ...taskFields,
-        //         };
-        //     },
-        // ),
+                const res = await taskService.delete(projectId, taskId);
+                if (!res.ok) {
+                    return rejectWithValue(res.errors);
+                }
+
+                return {
+                    projectId,
+                    columnId,
+                    taskId,
+                };
+            },
+            {
+                fulfilled: (state, action) => {
+                    if (!state.pipelineInfo) return;
+                    const { projectId, columnId, taskId } = action.payload;
+                    const column = state.pipelineInfo.columns.find(
+                        (col) => col.id === columnId,
+                    );
+                    if (!column) return;
+
+                    column.tasks = column.tasks.filter((t) => t.id !== taskId);
+                },
+                rejected: (state, action) => {
+                    toast.error(
+                        state.errors[0] ??
+                            "Произошла ошибка при удалении задачи",
+                    );
+                },
+            },
+        ),
     }),
     selectors: {
         selectAll: (state) => state,
@@ -190,8 +339,17 @@ export const pipelineSlice = createAppSlice({
 });
 
 // Экспорт actions
-export const { clear, fetchPipelineInfo, modifyColumn, modifyTask } =
-    pipelineSlice.actions;
+export const {
+    clear,
+    fetchPipelineInfo,
+    sendCreateTask,
+    addTask,
+    modifyTask,
+    removeTask,
+    createColumn,
+    modifyColumn,
+    removeColumn,
+} = pipelineSlice.actions;
 
 // Экспорт selectors
 export const { selectAll, selectPipelineInfo, selectIsLoading, selectErrors } =

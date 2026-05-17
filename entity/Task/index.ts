@@ -42,7 +42,20 @@ class TaskService {
             method: "GET",
         });
     }
-    async create(projectId: Project["id"]) {}
+    async create(
+        projectId: Project["id"],
+        pipelineId: Pipeline["id"],
+        taskFields: Partial<Task>,
+    ) {
+        return await myFetch<string>(this.ROUTES.default(projectId), {
+            method: "POST",
+            body: JSON.stringify({
+                idempotency_key: String(Date.now()) + String(Date.now()),
+                pipeline_id: pipelineId,
+                ...taskFields,
+            }),
+        });
+    }
     async get(projectId: Project["id"], taskId: Task["id"]) {}
     async update(
         projectId: Project["id"],
@@ -57,7 +70,14 @@ class TaskService {
             },
         );
     }
-    async delete(projectId: Project["id"], taskId: Task["id"]) {}
+    async delete(projectId: Project["id"], taskId: Task["id"]) {
+        return await myFetch<{ detail: string }>(
+            this.ROUTES.task_id(projectId, taskId),
+            {
+                method: "DELETE",
+            },
+        );
+    }
     async move(projectId: Project["id"], taskId: Task["id"]) {}
     async addAssigne(
         projectId: Project["id"],

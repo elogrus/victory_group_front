@@ -1,38 +1,90 @@
 "use client";
 
-import { modifyColumn } from "@/features/Dashboard/providers/Pipeline/slice";
+import {
+    modifyColumn,
+    modifyTask,
+    removeTask,
+    sendCreateTask,
+} from "@/features/Dashboard/providers/Pipeline/slice";
 import { useAppDispatch, useAppSelector } from "@/shared/hooks/reduxHooks";
 import { Button } from "@/shared/ui/button";
+import { useParams } from "next/navigation";
 
 export default function Board() {
     const columns = useAppSelector(
         (state) => state.pipeline.pipelineInfo?.columns,
     );
     const dispatch = useAppDispatch();
+    const params = useParams();
     return (
         <div className="flex flex-col gap-2">
-            {columns?.map((c) => (
-                <span key={c.id}>
-                    {c.id} - {c.name}
+            {params.projectId &&
+                params.pipelineId &&
+                columns &&
+                columns.length > 0 && (
                     <Button
                         onClick={async () => {
                             console.log("start loading");
                             await dispatch(
-                                modifyColumn({
-                                    columnId: c.id,
-                                    pipelineId: c.pipeline_id,
-                                    columnFields: {
-                                        name: "aboba222",
+                                sendCreateTask({
+                                    columnId: columns[0].id,
+                                    projectId: +params.projectId!,
+                                    pipelineId: +params.pipelineId!,
+                                    taskFields: {
+                                        column_id: columns[0].id,
+                                        description: "пельмени описание",
+                                        order: 0,
+                                        priority: 1,
+                                        title: "пельмени заголовок",
                                     },
                                 }),
                             );
                             console.log("end loading");
                         }}
                     >
-                        modify name to aboba222
+                        добавить задачу "пельмени"
                     </Button>
-                </span>
-            ))}
+                )}
+            {columns &&
+                columns.length > 0 &&
+                columns[0].tasks.map((t) => (
+                    <span key={t.id}>
+                        {t.id} - {t.title}
+                        <Button
+                            onClick={async () => {
+                                console.log("start loading");
+                                await dispatch(
+                                    modifyTask({
+                                        columnId: t.column_id,
+                                        projectId: t.project_id,
+                                        taskId: t.id,
+                                        taskFields: {
+                                            title: "aboba333",
+                                        },
+                                    }),
+                                );
+                                console.log("end loading");
+                            }}
+                        >
+                            modify title to aboba333
+                        </Button>
+                        <Button
+                            onClick={async () => {
+                                console.log("start loading");
+                                await dispatch(
+                                    removeTask({
+                                        columnId: t.column_id,
+                                        projectId: t.project_id,
+                                        taskId: t.id,
+                                    }),
+                                );
+                                console.log("end loading");
+                            }}
+                        >
+                            удалить задачу
+                        </Button>
+                    </span>
+                ))}
         </div>
     );
 }
