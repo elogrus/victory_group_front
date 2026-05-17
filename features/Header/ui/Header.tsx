@@ -53,7 +53,7 @@ export function Header({ onCreateClick }: { onCreateClick?: () => void }) {
 
                 <nav className="hidden xl:flex gap-5 ml-6 text-sm font-medium items-center">
                     <button
-                        onClick={() => router.push('/')}
+                        onClick={() => router.push('/d')}
                         className={`whitespace-nowrap transition-colors ${pathname === '/' ? 'text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'}`}
                     >
                         Проекты
