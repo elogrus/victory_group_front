@@ -5,6 +5,15 @@ import { Search, Bell, Settings, HelpCircle, Grid3X3, User, LogOut, Moon, Sun, M
 import { useState, useRef, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { MOCK_NOTIFICATIONS } from "@/shared/lib/data";
+import { myFetch } from "@/shared/lib/myFetch";
+import { CONSTS } from "@/shared/lib/consts";
+
+interface UserData {
+    id: number;
+    name: string;
+    email: string;
+    tg_id?: number | null;
+}
 
 export function Header({ onCreateClick }: { onCreateClick?: () => void }) {
     const router = useRouter();
@@ -13,9 +22,26 @@ export function Header({ onCreateClick }: { onCreateClick?: () => void }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [notifOpen, setNotifOpen] = useState(false);
     const [isDark, setIsDark] = useState(true);
+    const [userData, setUserData] = useState<UserData | null>(null);
 
     const userMenuRef = useRef<HTMLDivElement>(null);
     const notifMenuRef = useRef<HTMLDivElement>(null);
+
+    // Загрузка данных пользователя
+    useEffect(() => {
+        const loadUser = async () => {
+            try {
+                const res = await myFetch<UserData>(`${CONSTS.API_URL}/users`);
+                if (res.ok && res.body) {
+                    setUserData(res.body);
+                }
+            } catch (err) {
+                console.error("Ошибка загрузки данных пользователя", err);
+            }
+        };
+
+        loadUser();
+    }, []);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -130,15 +156,15 @@ export function Header({ onCreateClick }: { onCreateClick?: () => void }) {
 
                 <div className="relative" ref={userMenuRef}>
                     <button onClick={() => setMenuOpen(!menuOpen)} className="w-8 h-8 rounded-full bg-blue-800 text-white text-xs font-bold flex items-center justify-center ml-1 ring-2 ring-transparent hover:ring-blue-500 transition-all">
-                        DK
+                        {userData?.name?.charAt(0).toUpperCase() || "U"}
                     </button>
                     {menuOpen && (
                         <div className="absolute right-0 top-10 w-64 bg-popover border rounded-md shadow-lg py-2 flex flex-col text-sm z-50">
                             <div className="px-4 py-3 border-b flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-blue-800 text-white flex items-center justify-center font-bold">DK</div>
+                                <div className="w-10 h-10 rounded-full bg-blue-800 text-white flex items-center justify-center font-bold">{userData?.name?.charAt(0).toUpperCase() || "U"}</div>
                                 <div>
-                                    <div className="font-semibold text-foreground">Diniar Karimov</div>
-                                    <div className="text-xs text-muted-foreground">mr.dinyar@gmail.com</div>
+                                    <div className="font-semibold text-foreground">{userData?.name || "Пользователь"}</div>
+                                    <div className="text-xs text-muted-foreground">{userData?.email || ""}</div>
                                 </div>
                             </div>
                             <button onClick={() => { setMenuOpen(false); router.push('/profile'); }} className="flex items-center gap-3 px-4 py-2 hover:bg-muted text-left text-foreground"><User className="w-4 h-4" /> Профиль</button>
