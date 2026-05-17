@@ -27,7 +27,7 @@ export const myFetch = async <T = unknown>(
             headers: {
                 "Content-Type": "application/json",
                 Authorization:
-                    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc3ODk2NDY0OCwiaWQiOjIsIm5hbWUiOiJzdHJpbmcifQ.wBG6mNb00DWKmBzltPjpjxmQRSg5nLFxLTBFYl624xo",
+                    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc3OTAwMTAzNCwiaWQiOjIsIm5hbWUiOiJzdHJpbmcifQ.kfvomajmMYlm2g0ZBHzNZlIuv-P5hbuYOcF_tBPCbmQ",
                 ...opts?.headers,
             },
             credentials: "include",

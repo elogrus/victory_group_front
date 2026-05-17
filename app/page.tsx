@@ -290,9 +290,9 @@ export default function Dashboard() {
             <Header onCreateClick={() => setCreateTaskOpen(true)} />
 
             <div className="flex flex-1 overflow-hidden">
-                <Sidebar
-                    projects={projects}
-                    activeProjId={activeProjId}
+                {/* <Sidebar
+                    // projects={projects}
+                    // activeProjId={activeProjId}
                     onSelect={(id: string) => {
                         setActiveProjId(id);
                         const proj = projects.find((p) => p.id === id);
@@ -300,7 +300,7 @@ export default function Dashboard() {
                             setActiveBoardId(proj.boards[0].id);
                     }}
                     onNewProject={() => setProjectModalOpen(true)}
-                />
+                /> */}
 
                 <main className="flex-1 flex flex-col overflow-hidden transition-all duration-300">
                     <div className="px-8 pt-6 pb-0 shrink-0">
@@ -331,7 +331,7 @@ export default function Dashboard() {
                             <DndContext
                                 sensors={boardSensors}
                                 collisionDetection={closestCenter}
-                                onDragEnd={handleBoardDragEnd}
+                                // onDragEnd={handleBoardDragEnd}
                             >
                                 <SortableContext
                                     items={activeProject.boards.map(

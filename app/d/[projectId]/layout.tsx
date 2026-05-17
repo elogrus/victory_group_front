@@ -1,6 +1,7 @@
 "use client";
 import { ProjectProvider } from "@/features/Dashboard/providers/Project/ProjectProvider";
 import { Header } from "@/features/Dashboard/ui/Header";
+import { Links } from "@/features/Dashboard/ui/Links";
 import { Tabs } from "@/features/Dashboard/ui/Tabs";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -14,6 +15,7 @@ export default function ProjectLayout({ children }: { children: ReactNode }) {
             {/* <Tabs /> */}
             <Header />
             <Tabs />
+            <Links />
             {children}
         </ProjectProvider>
     );
