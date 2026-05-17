@@ -7,6 +7,7 @@ import {
     modifyTask,
     removeTask,
     fetchCreateTask,
+    addTask,
 } from "@/features/Dashboard/providers/Pipeline/slice";
 import { useAppDispatch, useAppSelector } from "@/shared/hooks/reduxHooks";
 import { Button } from "@/shared/ui/button";
