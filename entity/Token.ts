@@ -2,7 +2,7 @@ export type Token = string;
 class TokenService {
     private TOKEN_KEY = "access_token";
     getToken() {
-        if (!localStorage) return;
+        if (typeof window === "undefined") return;
         const token: Token | null = localStorage.getItem(this.TOKEN_KEY);
         return token;
     }
