@@ -26,6 +26,15 @@ class TaskService {
     private ROUTES = {
         default: (projectId: Project["id"]) =>
             CONSTS.API_URL + `/projects/${projectId}/tasks`,
+        task_id: (projectId: Project["id"], taskId: Task["id"]) =>
+            CONSTS.API_URL + `/projects/${projectId}/tasks/${taskId}`,
+        user_id: (
+            projectId: Project["id"],
+            taskId: Task["id"],
+            userId: User["id"],
+        ) =>
+            CONSTS.API_URL +
+            `/projects/${projectId}/tasks/${taskId}/assignees/${userId}`,
     };
     async getAll(projectId: Project["id"]) {}
     async getAllPipeline(projectId: Project["id"], pipelineId: Pipeline["id"]) {
@@ -35,7 +44,19 @@ class TaskService {
     }
     async create(projectId: Project["id"]) {}
     async get(projectId: Project["id"], taskId: Task["id"]) {}
-    async update(projectId: Project["id"], taskId: Task["id"]) {}
+    async update(
+        projectId: Project["id"],
+        taskId: Task["id"],
+        taskFields: Partial<Task>,
+    ) {
+        return await myFetch<{ detail: string; task: Task }>(
+            this.ROUTES.task_id(projectId, taskId),
+            {
+                method: "PATCH",
+                body: JSON.stringify(taskFields),
+            },
+        );
+    }
     async delete(projectId: Project["id"], taskId: Task["id"]) {}
     async move(projectId: Project["id"], taskId: Task["id"]) {}
     async addAssigne(
