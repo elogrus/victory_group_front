@@ -3,7 +3,7 @@ import pipelineService, { Pipeline, PipelineInfo } from "@/entity/Pipeline";
 import { Project } from "@/entity/Project";
 import taskService, { Task } from "@/entity/Task";
 import { createAppSlice } from "@/shared/lib/createAppSlice";
-import { createSelector, PayloadAction } from "@reduxjs/toolkit";
+import { PayloadAction } from "@reduxjs/toolkit";
 import { toast } from "sonner";
 
 interface State {
@@ -55,13 +55,30 @@ export const pipelineSlice = createAppSlice({
             },
         ),
 
-        createColumn: create.asyncThunk(
+        addColumn: create.reducer(
+            (
+                state,
+                action: PayloadAction<{
+                    pipelineId: Pipeline["id"];
+                    newColumn: Column;
+                }>,
+            ) => {
+                if (!state.pipelineInfo) return;
+                const { pipelineId, newColumn } = action.payload;
+                state.pipelineInfo.columns = [
+                    ...state.pipelineInfo.columns,
+                    { ...newColumn, pipeline_id: pipelineId, tasks: [] },
+                ];
+            },
+        ),
+
+        fetchCreateColumn: create.asyncThunk(
             async (
                 payload: {
                     pipelineId: Pipeline["id"];
                     columnFields: Omit<Column, "id">;
                 },
-                { rejectWithValue },
+                { rejectWithValue, dispatch },
             ) => {
                 const { pipelineId, columnFields } = payload;
 
@@ -70,36 +87,50 @@ export const pipelineSlice = createAppSlice({
                     columnFields,
                 );
                 if (!res.ok) {
-                    return rejectWithValue(res.errors);
-                }
-
-                return { pipelineId, newColumn: res.body.column };
-            },
-            {
-                fulfilled: (state, action) => {
-                    if (!state.pipelineInfo) return;
-                    const { pipelineId, newColumn } = action.payload;
-                    state.pipelineInfo.columns = [
-                        ...state.pipelineInfo.columns,
-                        { ...newColumn, pipeline_id: pipelineId, tasks: [] },
-                    ];
-                },
-                rejected: (state, action) => {
                     toast.error(
-                        state.errors[0] ??
+                        res.errors[0] ??
                             "Произошла ошибка при создании колонки",
                     );
-                },
+                    return;
+                }
+                dispatch(
+                    addColumn({
+                        pipelineId,
+                        newColumn: res.body.column,
+                    }),
+                );
             },
         ),
-        modifyColumn: create.asyncThunk(
+
+        modifyColumn: create.reducer(
+            (
+                state,
+                action: PayloadAction<{
+                    columnId: Column["id"];
+                    newColumn: Column;
+                }>,
+            ) => {
+                if (!state.pipelineInfo) return;
+                const { columnId, newColumn } = action.payload;
+                const columnIndex = state.pipelineInfo.columns.findIndex(
+                    (col) => col.id === columnId,
+                );
+                if (columnIndex === -1) return;
+                state.pipelineInfo.columns[columnIndex] = {
+                    ...state.pipelineInfo.columns[columnIndex],
+                    ...newColumn,
+                };
+            },
+        ),
+
+        fetchModifyColumn: create.asyncThunk(
             async (
                 payload: {
                     pipelineId: Pipeline["id"];
                     columnId: Column["id"];
                     columnFields: Partial<Column>;
                 },
-                { rejectWithValue },
+                { rejectWithValue, dispatch },
             ) => {
                 const { pipelineId, columnId, columnFields } = payload;
 
@@ -109,109 +140,51 @@ export const pipelineSlice = createAppSlice({
                     columnFields,
                 );
                 if (!res.ok) {
-                    return rejectWithValue(res.errors);
-                }
-
-                return { pipelineId, columnId, newColumn: res.body.column };
-            },
-            {
-                fulfilled: (state, action) => {
-                    if (!state.pipelineInfo) return;
-                    const { pipelineId, columnId, newColumn } = action.payload;
-                    const columnIndex = state.pipelineInfo.columns.findIndex(
-                        (col) => col.id === columnId,
-                    );
-                    if (columnIndex === -1) return;
-                    state.pipelineInfo.columns[columnIndex] = {
-                        ...state.pipelineInfo.columns[columnIndex],
-                        ...newColumn,
-                    };
-                },
-                rejected: (state, action) => {
                     toast.error(
-                        state.errors[0] ??
+                        res.errors[0] ??
                             "Произошла ошибка при обновлении колонки",
                     );
-                },
+                    return;
+                }
+
+                dispatch(
+                    modifyColumn({
+                        columnId: columnId,
+                        newColumn: res.body.column,
+                    }),
+                );
             },
         ),
-        removeColumn: create.asyncThunk(
+        removeColumn: create.reducer(
+            (state, action: PayloadAction<Column["id"]>) => {
+                if (!state.pipelineInfo) return;
+                const columnId = action.payload;
+                state.pipelineInfo.columns = state.pipelineInfo.columns.filter(
+                    (c) => c.id !== columnId,
+                );
+            },
+        ),
+        fetchRemoveColumn: create.asyncThunk(
             async (
                 payload: {
                     pipelineId: Pipeline["id"];
                     columnId: Column["id"];
                 },
-                { rejectWithValue },
+                { rejectWithValue, dispatch },
             ) => {
                 const { pipelineId, columnId } = payload;
 
                 const res = await columnService.delete(pipelineId, columnId);
                 if (!res.ok) {
-                    return rejectWithValue(res.errors);
-                }
-
-                return { pipelineId, columnId };
-            },
-            {
-                fulfilled: (state, action) => {
-                    if (!state.pipelineInfo) return;
-                    const { pipelineId, columnId } = action.payload;
-                    state.pipelineInfo.columns =
-                        state.pipelineInfo.columns.filter(
-                            (c) => c.id !== columnId,
-                        );
-                },
-                rejected: (state, action) => {
                     toast.error(
-                        state.errors[0] ??
+                        res.errors[0] ??
                             "Произошла ошибка при удалении колонки",
                     );
-                },
-            },
-        ),
-
-        sendCreateTask: create.asyncThunk(
-            async (
-                payload: {
-                    projectId: Project["id"];
-                    pipelineId: Pipeline["id"];
-                    columnId: Column["id"];
-                    taskFields: Partial<Task>;
-                },
-                { rejectWithValue },
-            ) => {
-                const { projectId, pipelineId, columnId, taskFields } = payload;
-
-                const res = await taskService.create(
-                    projectId,
-                    pipelineId,
-                    taskFields,
-                );
-                if (!res.ok) {
-                    return rejectWithValue(res.errors);
+                    return;
                 }
 
-                return {
-                    projectId,
-                    pipelineId,
-                    columnId,
-                };
-            },
-            {
-                fulfilled: (state, action) => {
-                    if (!state.pipelineInfo) return;
-                    const { projectId, columnId } = action.payload;
-                    const column = state.pipelineInfo.columns.find(
-                        (col) => col.id === columnId,
-                    );
-                    if (!column) return;
-                },
-                rejected: (state, action) => {
-                    toast.error(
-                        state.errors[0] ??
-                            "Произошла ошибка при создании задачи",
-                    );
-                },
+                dispatch(removeColumn(columnId));
+                return { pipelineId, columnId };
             },
         ),
         addTask: create.reducer(
@@ -232,8 +205,47 @@ export const pipelineSlice = createAppSlice({
                 column.tasks = [...column.tasks, newTask];
             },
         ),
+        fetchCreateTask: create.asyncThunk(
+            async (
+                payload: {
+                    projectId: Project["id"];
+                    pipelineId: Pipeline["id"];
+                    columnId: Column["id"];
+                    taskFields: {
+                        external_id: string;
+                        title: string;
+                        column_id: number;
+                        pipeline_id: number;
+                    } & Partial<Task>;
+                },
+                { rejectWithValue },
+            ) => {
+                const { projectId, pipelineId, columnId, taskFields } = payload;
 
-        modifyTask: create.asyncThunk(
+                const res = await taskService.create(projectId, taskFields);
+                if (!res.ok) {
+                    toast.error(
+                        res.errors[0] ?? "Произошла ошибка при создании задачи",
+                    );
+                    return;
+                }
+            },
+        ),
+
+        modifyTask: create.reducer((state, action: PayloadAction<Task>) => {
+            const newTask = action.payload;
+            if (!state.pipelineInfo) return;
+            const column = state.pipelineInfo.columns.find(
+                (col) => col.id === newTask.column_id,
+            );
+            if (!column) return;
+            const taskIndex = column.tasks.findIndex(
+                (t) => t.id === newTask.id,
+            );
+            column.tasks[taskIndex] = newTask;
+        }),
+
+        fetchModifyTask: create.asyncThunk(
             async (
                 payload: {
                     projectId: Project["id"];
@@ -241,7 +253,7 @@ export const pipelineSlice = createAppSlice({
                     taskId: Task["id"];
                     taskFields: Partial<Task>;
                 },
-                { rejectWithValue },
+                { rejectWithValue, dispatch },
             ) => {
                 const { projectId, columnId, taskId, taskFields } = payload;
 
@@ -251,82 +263,59 @@ export const pipelineSlice = createAppSlice({
                     taskFields,
                 );
                 if (!res.ok) {
-                    return rejectWithValue(res.errors);
-                }
-
-                return {
-                    projectId,
-                    columnId,
-                    taskId,
-                    newTask: res.body.task,
-                };
-            },
-            {
-                fulfilled: (state, action) => {
-                    if (!state.pipelineInfo) return;
-                    const { projectId, columnId, taskId, newTask } =
-                        action.payload;
-                    const column = state.pipelineInfo.columns.find(
-                        (col) => col.id === columnId,
-                    );
-                    if (!column) return;
-
-                    const taskIndex = column.tasks.findIndex(
-                        (t) => t.id === taskId,
-                    );
-                    if (taskIndex === -1) return;
-                    column.tasks[taskIndex] = {
-                        ...column.tasks[taskIndex],
-                        ...newTask,
-                    };
-                },
-                rejected: (state, action) => {
                     toast.error(
-                        state.errors[0] ??
+                        res.errors[0] ??
                             "Произошла ошибка при обновлении задачи",
                     );
-                },
+                    return;
+                }
+
+                dispatch(modifyTask(res.body.task));
             },
         ),
-        removeTask: create.asyncThunk(
+        removeTask: create.reducer(
+            (
+                state,
+                action: PayloadAction<{
+                    columnId: Column["id"];
+                    taskId: Task["id"];
+                }>,
+            ) => {
+                if (!state.pipelineInfo) return;
+                const { columnId, taskId } = action.payload;
+                const column = state.pipelineInfo.columns.find(
+                    (col) => col.id === columnId,
+                );
+                if (!column) return;
+
+                column.tasks = column.tasks.filter((t) => t.id !== taskId);
+            },
+        ),
+        fetchRemoveTask: create.asyncThunk(
             async (
                 payload: {
                     projectId: Project["id"];
                     columnId: Column["id"];
                     taskId: Task["id"];
                 },
-                { rejectWithValue },
+                { rejectWithValue, dispatch },
             ) => {
                 const { projectId, columnId, taskId } = payload;
 
                 const res = await taskService.delete(projectId, taskId);
                 if (!res.ok) {
-                    return rejectWithValue(res.errors);
+                    toast.error(
+                        res.errors[0] ?? "Произошла ошибка при удалении задачи",
+                    );
+                    return;
                 }
 
-                return {
-                    projectId,
-                    columnId,
-                    taskId,
-                };
-            },
-            {
-                fulfilled: (state, action) => {
-                    if (!state.pipelineInfo) return;
-                    const { projectId, columnId, taskId } = action.payload;
-                    const column = state.pipelineInfo.columns.find(
-                        (col) => col.id === columnId,
-                    );
-                    if (!column) return;
-
-                    column.tasks = column.tasks.filter((t) => t.id !== taskId);
-                },
-                rejected: (state, action) => {
-                    toast.error(
-                        state.errors[0] ??
-                            "Произошла ошибка при удалении задачи",
-                    );
-                },
+                dispatch(
+                    removeTask({
+                        columnId,
+                        taskId,
+                    }),
+                );
             },
         ),
     }),
@@ -342,13 +331,24 @@ export const pipelineSlice = createAppSlice({
 export const {
     clear,
     fetchPipelineInfo,
-    sendCreateTask,
+
     addTask,
+    fetchCreateTask,
+
     modifyTask,
+    fetchModifyTask,
+
     removeTask,
-    createColumn,
+    fetchRemoveTask,
+
+    addColumn,
+    fetchCreateColumn,
+
     modifyColumn,
+    fetchModifyColumn,
+
     removeColumn,
+    fetchRemoveColumn,
 } = pipelineSlice.actions;
 
 // Экспорт selectors

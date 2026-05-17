@@ -1,10 +1,12 @@
 "use client";
 
 import {
+    fetchModifyTask,
+    fetchRemoveTask,
     modifyColumn,
     modifyTask,
     removeTask,
-    sendCreateTask,
+    fetchCreateTask,
 } from "@/features/Dashboard/providers/Pipeline/slice";
 import { useAppDispatch, useAppSelector } from "@/shared/hooks/reduxHooks";
 import { Button } from "@/shared/ui/button";
@@ -26,11 +28,15 @@ export default function Board() {
                         onClick={async () => {
                             console.log("start loading");
                             await dispatch(
-                                sendCreateTask({
+                                fetchCreateTask({
                                     columnId: columns[0].id,
                                     projectId: +params.projectId!,
                                     pipelineId: +params.pipelineId!,
                                     taskFields: {
+                                        pipeline_id: +params.pipelineId!,
+                                        external_id:
+                                            String(Date.now()) +
+                                            String(Date.now()),
                                         column_id: columns[0].id,
                                         description: "пельмени описание",
                                         order: 0,
@@ -54,7 +60,7 @@ export default function Board() {
                             onClick={async () => {
                                 console.log("start loading");
                                 await dispatch(
-                                    modifyTask({
+                                    fetchModifyTask({
                                         columnId: t.column_id,
                                         projectId: t.project_id,
                                         taskId: t.id,
@@ -72,7 +78,7 @@ export default function Board() {
                             onClick={async () => {
                                 console.log("start loading");
                                 await dispatch(
-                                    removeTask({
+                                    fetchRemoveTask({
                                         columnId: t.column_id,
                                         projectId: t.project_id,
                                         taskId: t.id,

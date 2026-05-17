@@ -44,16 +44,17 @@ class TaskService {
     }
     async create(
         projectId: Project["id"],
-        pipelineId: Pipeline["id"],
-        taskFields: Partial<Task>,
+        taskFields: {
+            external_id: string;
+            title: string;
+            column_id: number;
+            pipeline_id: number;
+        } & Partial<Task>,
+        //external_id title column_id pipeline_id
     ) {
         return await myFetch<string>(this.ROUTES.default(projectId), {
             method: "POST",
-            body: JSON.stringify({
-                idempotency_key: String(Date.now()) + String(Date.now()),
-                pipeline_id: pipelineId,
-                ...taskFields,
-            }),
+            body: JSON.stringify(taskFields),
         });
     }
     async get(projectId: Project["id"], taskId: Task["id"]) {}

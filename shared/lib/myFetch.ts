@@ -1,3 +1,5 @@
+import tokenService from "@/entity/Token";
+
 interface BaseFetchResult {
     ok: boolean;
     status: number;
@@ -20,14 +22,14 @@ export const myFetch = async <T = unknown>(
     ...args: Parameters<typeof fetch>
 ): Promise<FetchResult<T>> => {
     try {
+        const token = tokenService.getToken();
         const url = args[0];
         const opts = args[1];
         const res = await fetch(url, {
             ...opts,
             headers: {
                 "Content-Type": "application/json",
-                Authorization:
-                    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc3OTAwOTE1MywiaWQiOjIsIm5hbWUiOiJzdHJpbmcifQ.-PmQGs2rjZPsb7glxF2iVITcFDLNNb5Sj03Gpua_3hI",
+                Authorization: token ? `Bearer ${token}` : "",
                 ...opts?.headers,
             },
             credentials: "include",

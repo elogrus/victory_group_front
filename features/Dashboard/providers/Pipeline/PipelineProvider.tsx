@@ -1,3 +1,4 @@
+"use client";
 import { Pipeline } from "@/entity/Pipeline";
 import { useAppDispatch } from "@/shared/hooks/reduxHooks";
 import { ReactNode, useEffect } from "react";

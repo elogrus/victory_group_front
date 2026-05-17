@@ -1,18 +1,14 @@
-import { CONSTS } from "@/shared/lib/consts";
-import { myFetch } from "@/shared/lib/myFetch";
-import { cookies } from "next/headers";
-
 export type Token = string;
 class TokenService {
     private TOKEN_KEY = "access_token";
-    private ROUTES = {
-        verify: CONSTS.API_URL + "/verify",
-    };
-    async getToken() {
-        const cookieStore = await cookies();
-        const token = cookieStore.get(this.TOKEN_KEY)?.value as Token | null;
-
+    getToken() {
+        if (!localStorage) return;
+        const token: Token | null = localStorage.getItem(this.TOKEN_KEY);
         return token;
+    }
+    saveToken(token: Token) {
+        if (!localStorage) return;
+        localStorage.setItem(this.TOKEN_KEY, token);
     }
 }
 const tokenService = new TokenService();
