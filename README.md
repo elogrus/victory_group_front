@@ -1,137 +1,167 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+﻿# Victory Group Project Dashboard
 
-## Getting Started
+Frontend-приложение для управления проектами, задачами и командной работой. Построено на **Next.js 16** и **React 19** с использованием современных UI-компонентов, Redux Toolkit и интегрированной визуализацией проектной карты.
 
-First, run the development server:
+## О проекте
+
+Victory Group — это интерфейс управления проектами и задачами, ориентированный на гибкий рабочий процесс:
+- Просмотр проектов и досок задач
+- Визуализация структуры проекта и роли участников
+- Управление пользователями и ролями через админ-панель
+- Карта проектов с иерархическим представлением
+- Профиль пользователя с проектами и контактами
+
+## Основные функции
+
+### Dashboard и проекты
+- Список проектов пользователя
+- Навигация к подробной странице проекта
+- Переключение между доской задач, картой проекта и админ-панелью
+
+### Kanban board
+- Drag-and-drop для задач
+- Разделение задач по колонкам/статусам
+- Отображение задач в рамках выбранного пайплайна
+
+### Project Map
+- Иерархическая визуализация проектов, ролей и участников
+- Динамические связи между проектами, ролями и пользователями
+- Используется `@xyflow/react` для отображения узлов и рёбер
+
+### Профиль пользователя
+- Отображение имени, email и Telegram ID
+- Список проектов, доступных текущему пользователю
+- Перенаправление к выбранному проекту
+- Сообщение «Нет контактов», если Telegram ID отсутствует
+
+### Админ-панель
+- Управление проектами
+- Управление ролями и пользователями
+- Автоматизация процессов
+
+### Уведомления и глобальный header
+- Счетчик непрочитанных уведомлений
+- Dropdown уведомлений в Header
+- Доступ к профилю и настройкам
+
+## Структура проекта
+
+```
+victory_group_front/
+├── app/                    # Маршруты приложения
+│   ├── auth/               # Страница аутентификации
+│   ├── d/                  # Dashboard и проекты
+│   ├── map/                # Карта проектов
+│   ├── profile/            # Страница профиля
+│   ├── admin/              # Админ-панель
+│   ├── onboarding/         # Онбординг
+│   ├── layout.tsx          # Общий layout
+│   └── globals.css         # Глобальные стили
+├── entity/                 # Domain entities и Redux slices
+│   ├── Project/            # Проекты
+│   ├── Task/               # Задачи
+│   ├── Pipeline/           # Пайплайны
+│   ├── User.ts             # Пользователи
+│   ├── Token.ts            # Токен авторизации
+│   └── Me.ts               # Auth сервис
+├── features/               # Feature модули
+│   ├── Header/             # Header UI
+│   ├── Auth/               # Аутентификация
+│   ├── Sidebar/            # Sidebar логика
+│   └── Admin/              # Админ-функции
+├── widgets/                # Сложные виджеты
+│   ├── KanbanBoard/        # Kanban доска
+│   └── ProjectMap/         # Карта проектов
+├── shared/                 # Утилиты, UI и схема
+│   ├── lib/                # fetch, константы, утилиты
+│   ├── redux/              # Redux store и провайдер
+│   ├── schemes/            # Zod схемы валидации
+│   └── ui/                 # Общие UI-компоненты
+├── next.config.ts
+├── package.json
+├── pnpm-lock.yaml
+├── pnpm-workspace.yaml
+├── README.md
+└── tsconfig.json
+```
+
+## Технологии
+
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS 4
+- Redux Toolkit
+- ky / myFetch
+- Zod
+- @xyflow/react
+- lucide-react
+- pnpm
+
+## Роуты
+
+| Роут | Описание |
+|------|----------|
+| `/` | Главная страница |
+| `/auth` | Страница авторизации |
+| `/d` | Dashboard проектов |
+| `/d/[projectId]` | Детали проекта |
+| `/d/[projectId]/[pipelineId]/board` | Kanban доска |
+| `/map` | Визуализация проектов |
+| `/profile` | Профиль пользователя |
+| `/admin` | Админ-панель |
+
+## Аутентификация
+
+Система использует JWT токен, сохраненный в `localStorage`.
+
+### Как работает
+1. Вход на странице `/auth`
+2. Токен сохраняется в `localStorage` как `access_token`
+3. `myFetch` добавляет токен в заголовок `Authorization`
+4. При 401 автоматически обрабатывается ошибка
+
+## Фетчинг данных
+
+Главная обертка для всех API-запросов находится в `shared/lib/myFetch.ts`.
+
+Пример вызова:
+
+```ts
+import { myFetch } from '@/shared/lib/myFetch';
+import { CONSTS } from '@/shared/lib/consts';
+
+const res = await myFetch<User>(`${CONSTS.API_URL}/users`);
+if (res.ok && res.body) {
+  console.log(res.body);
+}
+```
+
+## Структура Redux
+
+Каждая сущность вынесена в `entity/*` и содержит:
+- `slice.ts` — редюсеры и экшены
+- `provider.tsx` — провайдер данных
+- `index.ts` — типы и экспорт
+
+Общий стор доступен через `shared/hooks/reduxHooks.ts`.
+
+## Установка и запуск
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Production build:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
+```bash
+pnpm build
+pnpm start
 ```
-victory_group_front
-├─ app
-│  ├─ auth
-│  │  └─ page.tsx
-│  ├─ d
-│  │  ├─ layout.tsx
-│  │  └─ page.tsx
-│  ├─ favicon.ico
-│  ├─ globals.css
-│  ├─ layout.tsx
-│  ├─ map
-│  │  └─ page.tsx
-│  └─ page.tsx
-├─ components
-│  ├─ CreateProjectModal.tsx
-│  ├─ CreateTaskModal.tsx
-│  ├─ Header.tsx
-│  ├─ KanbanBoard.tsx
-│  ├─ ListView.tsx
-│  ├─ ProjectMap.tsx
-│  ├─ Sidebar.tsx
-│  ├─ SummaryView.tsx
-│  ├─ TaskModal.tsx
-│  └─ TaskTable.tsx
-├─ components.json
-├─ debug.log
-├─ entity
-│  ├─ AutomationRule.ts
-│  ├─ Column.ts
-│  ├─ Me.ts
-│  ├─ Notification.ts
-│  ├─ Pipeline.ts
-│  ├─ Project
-│  │  ├─ index.ts
-│  │  ├─ provider.tsx
-│  │  └─ slice.ts
-│  ├─ Role.ts
-│  ├─ Task.ts
-│  ├─ Token.ts
-│  └─ User.ts
-├─ features
-│  ├─ Auth
-│  │  ├─ client
-│  │  │  └─ AuthProvider.tsx
-│  │  ├─ forms
-│  │  │  ├─ AuthForm.tsx
-│  │  │  └─ debug.log
-│  │  └─ server
-│  │     └─ ProtectRoute.ts
-│  └─ Sidebar
-│     └─ useSidebar.ts
-├─ LICENSE
-├─ next.config.ts
-├─ package.json
-├─ pnpm-lock.yaml
-├─ pnpm-workspace.yaml
-├─ postcss.config.mjs
-├─ README.md
-├─ shared
-│  ├─ assets
-│  │  ├─ fulllogo.svg
-│  │  └─ logo.svg
-│  ├─ hooks
-│  │  ├─ reduxHooks.ts
-│  │  └─ useAccurateContext.ts
-│  ├─ lib
-│  │  ├─ consts.ts
-│  │  ├─ createAccurateContext.ts
-│  │  ├─ createAppSlice.ts
-│  │  ├─ data.ts
-│  │  ├─ myFetch.ts
-│  │  └─ utils.ts
-│  ├─ redux
-│  │  ├─ store.ts
-│  │  └─ StoreProvider.tsx
-│  ├─ schemes
-│  │  ├─ emailSchema.ts
-│  │  ├─ passwordSchema.ts
-│  │  ├─ phoneSchema.ts
-│  │  └─ telegramSchema.ts
-│  └─ ui
-│     ├─ avatar.tsx
-│     ├─ badge.tsx
-│     ├─ button.tsx
-│     ├─ card.tsx
-│     ├─ dialog.tsx
-│     ├─ dropdown-menu.tsx
-│     ├─ field.tsx
-│     ├─ input.tsx
-│     ├─ label.tsx
-│     ├─ scroll-area.tsx
-│     ├─ separator.tsx
-│     ├─ sonner.tsx
-│     ├─ spinner.tsx
-│     ├─ table.tsx
-│     └─ tabs.tsx
-└─ tsconfig.json
 
-```
+## Особенности
+
+- Используются современные UI-паттерны
+- Компоненты настроены через Tailwind
+- Админ-панель встроена в основное приложение

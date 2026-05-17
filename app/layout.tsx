@@ -7,7 +7,7 @@ import { StoreProvider } from "@/shared/redux/StoreProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-    title: "Vira",
+    title: "Victory Group - Event-driven Kanban",
     description: "Event-driven Kanban",
 };
 
