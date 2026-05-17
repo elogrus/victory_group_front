@@ -101,28 +101,24 @@ export const MOCK_ROLES: Role[] = [
     },
 ];
 
-// export const INITIAL_PROJECTS: Project[] = [
-//     {
-//         id: "proj-1",
-//         name: "VictoryGroup",
-//         assignments: [
-//             { userId: "1", roleId: "role-admin" },
-//             { userId: "2", roleId: "role-viewer" }
-//         ],
-//         boards: [
-//             {
-//                 id: "board-1",
-//                 name: "Основная доска",
-//                 columns: [
-//                     { id: "todo", title: "TO DO", color: "#ebecf0" },
-//                     { id: "in-progress", title: "IN PROGRESS", color: "#0052cc" },
-//                     { id: "done", title: "DONE", color: "#36b37e" },
-//                 ],
-//                 tasks: []
-//             }
-//         ]
-//     }
-// ];
+export const INITIAL_PROJECTS: Project[] = [
+    {
+        id: "proj-1",
+        name: "VictoryGroup",
+        boards: [
+            {
+                id: "board-1",
+                name: "Основная доска",
+                columns: [
+                    { id: "todo", title: "TO DO", color: "#ebecf0" },
+                    { id: "in-progress", title: "IN PROGRESS", color: "#0052cc" },
+                    { id: "done", title: "DONE", color: "#36b37e" },
+                ],
+                tasks: []
+            }
+        ]
+    }
+];
 
 export const PROJECT_HIERARCHY: any = {
     "proj-1": {
