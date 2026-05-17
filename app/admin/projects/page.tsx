@@ -1,26 +1,27 @@
 "use client";
 
-import { useState } from "react";
-import { AdminProjects } from "@/features/Admin/ui/AdminProjects";
-import { INITIAL_PROJECTS, MOCK_USERS, MOCK_ROLES } from "@/shared/lib/data";
 import { useAppSelector } from "@/shared/hooks/reduxHooks";
-import { Spinner } from "@/shared/ui/spinner";
+import { AdminProjects } from "@/features/Admin/ui/AdminProjects";
 
 export default function AdminProjectsPage() {
+    const projects = useAppSelector((state) => state.admin.projects);
+    const users = useAppSelector((state) => state.admin.users);
     const isLoading = useAppSelector((state) => state.admin.isLoading);
 
-    const [projects, setProjects] = useState(INITIAL_PROJECTS);
-    const [users] = useState(MOCK_USERS);
-    const [roles] = useState(MOCK_ROLES);
+    // Роли пока мокаем, так как для них нет отдельного эндпоинта в слайсе
+    const mockRoles = [
+        { id: 1, name: "admin" },
+        { id: 15, name: "member" },
+        { id: 16, name: "developer" }
+    ];
 
-    if (isLoading.projects || isLoading.users) return <Spinner />;
     return (
         <div className="animate-in fade-in duration-500">
             <AdminProjects
-                projects={projects}
-                setProjects={setProjects}
-                users={users}
-                roles={roles}
+                projects={projects || []}
+                users={users || []}
+                roles={mockRoles}
+                isLoading={isLoading}
             />
         </div>
     );

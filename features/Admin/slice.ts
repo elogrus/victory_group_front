@@ -1,155 +1,197 @@
+"use client";
+
 import adminService from "@/entity/Admin";
-import pipelineService, { Pipeline } from "@/entity/Pipeline";
 import { Project } from "@/entity/Project";
 import { User } from "@/entity/User";
+import { Role } from "@/shared/lib/data";
 import { createAppSlice } from "@/shared/lib/createAppSlice";
 import { PayloadAction } from "@reduxjs/toolkit";
-import { Users } from "lucide-react";
+import { toast } from "sonner";
 
 interface State {
-    isLoading: {
-        projects: boolean;
-        users: boolean;
-    };
+    isLoading: boolean;
     projects: Project[] | null;
     users: User[] | null;
+    roles: Role[] | null; // <-- Добавили
     errors: string[];
+    automationRules: any[] | null;
 }
 
 const initialState: State = {
-    isLoading: {
-        projects: false,
-        users: false,
-    },
+    isLoading: false,
     projects: null,
     users: null,
+    roles: null,
     errors: [],
+    automationRules: null,
 };
 
 export const adminSlice = createAppSlice({
-    name: "admin",
+    name: "admin", 
     initialState,
     reducers: (create) => ({
         clear: create.reducer((state) => {
             state.projects = null;
+            state.users = null;
+            state.roles = null;
             state.errors = [];
         }),
 
         fetchProjects: create.asyncThunk(
             async (_, { rejectWithValue }) => {
                 const res = await adminService.getProjects();
-                if (!res.ok) {
-                    return rejectWithValue(res.errors);
-                }
+                if (!res.ok) return rejectWithValue(res.errors);
                 return res.body;
             },
             {
-                pending: (state) => {
-                    state.isLoading.projects = true;
-                },
+                pending: (state) => { state.isLoading = true; },
                 fulfilled: (state, action) => {
-                    state.isLoading.projects = false;
+                    state.isLoading = false;
                     state.projects = action.payload;
                 },
                 rejected: (state, action) => {
-                    state.isLoading.projects = false;
+                    state.isLoading = false;
                     state.errors = action.payload as string[];
                 },
-            },
+            }
         ),
 
         fetchUsers: create.asyncThunk(
             async (_, { rejectWithValue }) => {
                 const res = await adminService.getUsers();
-                if (!res.ok) {
-                    return rejectWithValue(res.errors);
-                }
+                if (!res.ok) return rejectWithValue(res.errors);
                 return res.body;
             },
             {
-                pending: (state) => {
-                    state.isLoading.users = true;
-                },
+                pending: (state) => { state.isLoading = true; },
                 fulfilled: (state, action) => {
-                    state.isLoading.users = false;
+                    state.isLoading = false;
                     state.users = action.payload;
                 },
                 rejected: (state, action) => {
-                    state.isLoading.users = false;
+                    state.isLoading = false;
                     state.errors = action.payload as string[];
                 },
-            },
+            }
         ),
 
-        setActivation: create.reducer(
-            (
-                state,
-                action: PayloadAction<{
-                    user_id: User["id"];
-                    activation: boolean;
-                }>,
-            ) => {
-                if (!state.users) return;
-                const { user_id, activation } = action.payload;
-                const user = state.users.find((u) => u.id === user_id);
-                if (!user) return;
-                user.is_active = activation;
+        fetchRoles: create.asyncThunk(
+            async (_, { rejectWithValue }) => {
+                const res = await adminService.getRoles();
+                if (!res.ok) return rejectWithValue(res.errors);
+                return res.body;
             },
+            {
+                fulfilled: (state, action) => {
+                    state.roles = action.payload;
+                }
+            }
+        ),
+
+        fetchRegisterUser: create.asyncThunk(
+            async (data: any, { dispatch }) => {
+                const res = await adminService.registerUser(data);
+                if (res.ok) {
+                    toast.success("Пользователь зарегистрирован");
+                    dispatch(adminSlice.actions.fetchUsers());
+                } else {
+                    toast.error(res.errors[0] || "Ошибка регистрации");
+                }
+                return res.ok;
+            }
         ),
 
         fetchSetActivation: create.asyncThunk(
-            async (
-                payload: {
-                    user_id: User["id"];
-                    activation: boolean;
-                },
-                { dispatch },
-            ) => {
-                const { user_id, activation } = payload;
-                const res = activation
-                    ? await adminService.activateUser(user_id)
-                    : await adminService.deactivateUser(user_id);
-                if (!res.ok) {
-                    return;
+            async (payload: { user_id: number; activation: boolean }, { dispatch }) => {
+                const res = payload.activation
+                    ? await adminService.activateUser(payload.user_id)
+                    : await adminService.deactivateUser(payload.user_id);
+                if (res.ok) {
+                    toast.success(payload.activation ? "Пользователь активирован" : "Пользователь деактивирован");
+                    dispatch(adminSlice.actions.fetchUsers());
                 }
-                dispatch(setActivation({ user_id, activation }));
-            },
-        ),
-
-        setSuperuser: create.reducer(
-            (
-                state,
-                action: PayloadAction<{
-                    user_id: User["id"];
-                    activation: boolean;
-                }>,
-            ) => {
-                if (!state.users) return;
-                const { user_id, activation } = action.payload;
-                const user = state.users.find((u) => u.id === user_id);
-                if (!user) return;
-                user.is_superuser = activation;
-            },
+            }
         ),
 
         fetchSetSuperuser: create.asyncThunk(
-            async (
-                payload: {
-                    user_id: User["id"];
-                    activation: boolean;
-                },
-                { dispatch },
-            ) => {
-                const { user_id, activation } = payload;
-                const res = await adminService.setSuperuser(
-                    user_id,
-                    activation,
-                );
-                if (!res.ok) {
-                    return;
+            async (payload: { user_id: number; activation: boolean }, { dispatch }) => {
+                const res = await adminService.setSuperuser(payload.user_id, payload.activation);
+                if (res.ok) {
+                    toast.success("Права изменены");
+                    dispatch(adminSlice.actions.fetchUsers());
                 }
-                dispatch(setSuperuser({ user_id, activation }));
+            }
+        ),
+
+        fetchCreateRole: create.asyncThunk(
+            async (data: any, { dispatch }) => {
+                const res = await adminService.createRole(data);
+                if (res.ok) {
+                    toast.success("Роль создана");
+                    dispatch(adminSlice.actions.fetchRoles());
+                }
+            }
+        ),
+
+        fetchUpdateRole: create.asyncThunk(
+            async (payload: { id: any, data: any }, { dispatch }) => {
+                const res = await adminService.updateRole(payload.id, payload.data);
+                if (res.ok) {
+                    toast.success("Роль обновлена");
+                    dispatch(adminSlice.actions.fetchRoles());
+                }
+            }
+        ),
+
+        fetchDeleteRole: create.asyncThunk(
+            async (id: any, { dispatch }) => {
+                const res = await adminService.deleteRole(id);
+                if (res.ok) {
+                    toast.success("Роль удалена");
+                    dispatch(adminSlice.actions.fetchRoles());
+                }
+            }
+        ),
+
+        fetchAutomationRules: create.asyncThunk(
+            async (projectId: number | string, { rejectWithValue }) => {
+                const res = await adminService.getAutomationRules(projectId);
+                if (!res.ok) return rejectWithValue(res.errors);
+                return res.body;
             },
+            {
+                fulfilled: (state, action) => { state.automationRules = action.payload; },
+            }
+        ),
+
+        fetchCreateRule: create.asyncThunk(
+            async (payload: { projectId: number; data: any }, { dispatch }) => {
+                const res = await adminService.createAutomationRule(payload.projectId, payload.data);
+                if (res.ok) {
+                    toast.success("Правило создано");
+                    dispatch(adminSlice.actions.fetchAutomationRules(payload.projectId));
+                }
+            }
+        ),
+
+        fetchUpdateRule: create.asyncThunk(
+            async (payload: { projectId: number; ruleId: number; data: any }, { dispatch }) => {
+                const res = await adminService.updateAutomationRule(payload.projectId, payload.ruleId, payload.data);
+                if (res.ok) {
+                    toast.success("Правило обновлено");
+                    dispatch(adminSlice.actions.fetchAutomationRules(payload.projectId));
+                }
+            }
+        ),
+
+        fetchDeleteRule: create.asyncThunk(
+            async (payload: { projectId: number; ruleId: number }, { dispatch }) => {
+                const res = await adminService.deleteAutomationRule(payload.projectId, payload.ruleId);
+                if (res.ok) {
+                    toast.success("Правило удалено");
+                    dispatch(adminSlice.actions.fetchAutomationRules(payload.projectId));
+                }
+            }
         ),
     }),
 });
@@ -158,8 +200,15 @@ export const {
     clear,
     fetchProjects,
     fetchUsers,
-    setActivation,
+    fetchRoles,
+    fetchRegisterUser,
     fetchSetActivation,
-    setSuperuser,
     fetchSetSuperuser,
+    fetchCreateRole,
+    fetchUpdateRole,
+    fetchDeleteRole,
+    fetchAutomationRules,
+    fetchCreateRule,
+    fetchDeleteRule,
+    fetchUpdateRule
 } = adminSlice.actions;

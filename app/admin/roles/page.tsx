@@ -1,15 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useAppSelector } from "@/shared/hooks/reduxHooks";
 import { AdminRoles } from "@/features/Admin/ui/AdminRoles";
-import { MOCK_ROLES } from "@/shared/lib/data";
 
 export default function AdminRolesPage() {
-    const [roles, setRoles] = useState(MOCK_ROLES);
+    const roles = useAppSelector((state) => state.admin.roles);
+    const isLoading = useAppSelector((state) => state.admin.isLoading);
 
     return (
         <div className="animate-in fade-in duration-500">
-            <AdminRoles roles={roles} setRoles={setRoles} />
+            <AdminRoles 
+                roles={roles || []} 
+                isLoading={isLoading} 
+            />
         </div>
     );
 }
