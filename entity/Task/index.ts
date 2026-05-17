@@ -3,6 +3,7 @@ import { Pipeline } from "../Pipeline";
 import { Project } from "../Project";
 import { User } from "../User";
 import { CONSTS } from "@/shared/lib/consts";
+import { Tag } from "../Tag";
 
 export type Task = {
     id: number;
@@ -14,7 +15,7 @@ export type Task = {
     deadline: string;
     priority: number;
     order: number;
-    tags: string[];
+    tags: Tag[];
     version: number;
     is_done: boolean;
     created_at: string;

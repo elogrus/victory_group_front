@@ -18,5 +18,5 @@ export default function ProjectPage() {
         pipelines[0].project_id !== +projectId!
     )
         return;
-    return redirect(`/d/${projectId}/${pipelines[0].id}`);
+    return redirect(`/d/${projectId}/${pipelines[0].id}/board`);
 }
