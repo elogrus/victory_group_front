@@ -22,7 +22,19 @@ class ColumnService {
         });
     }
     async create(pipelineId: Pipeline["id"]) {}
-    async update(pipelineId: Pipeline["id"], columnId: Column["id"]) {}
+    async update(
+        pipelineId: Pipeline["id"],
+        columnId: Column["id"],
+        fields: Partial<Column>,
+    ) {
+        return await myFetch<{
+            detail: string;
+            column: Column;
+        }>(this.ROUTES.column_id(pipelineId, columnId), {
+            method: "PATCH",
+            body: JSON.stringify(fields),
+        });
+    }
     async delete(pipelineId: Pipeline["id"], columnId: Column["id"]) {}
 }
 const columnService = new ColumnService();
