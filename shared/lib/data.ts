@@ -31,13 +31,26 @@ export interface ProjectAssignment {
     roleId: string;
 }
 
-export interface Project {
-    id: string;
+export interface ProjectRole {
+    id: number | string;
     name: string;
-    boards: Board[];
-    assignments?: ProjectAssignment[];
 }
 
+export interface ProjectMember {
+    id: number | string;
+    login: string;
+    name: string;
+    role: ProjectRole;
+}
+
+export interface Project {
+    id: string | number;
+    name: string;
+    description?: string | null;
+    created_at?: string;
+    boards: Board[]; // или pipelines
+    members?: ProjectMember[]; // <-- ВАЖНО: теперь members, а не assignments
+}
 // --- ОБНОВЛЕННАЯ МОДЕЛЬ ПОЛЬЗОВАТЕЛЯ ---
 export interface User {
     id: string;
@@ -88,28 +101,28 @@ export const MOCK_ROLES: Role[] = [
     },
 ];
 
-export const INITIAL_PROJECTS: Project[] = [
-    {
-        id: "proj-1",
-        name: "VictoryGroup",
-        assignments: [
-            { userId: "1", roleId: "role-admin" },
-            { userId: "2", roleId: "role-viewer" }
-        ],
-        boards: [
-            {
-                id: "board-1",
-                name: "Основная доска",
-                columns: [
-                    { id: "todo", title: "TO DO", color: "#ebecf0" },
-                    { id: "in-progress", title: "IN PROGRESS", color: "#0052cc" },
-                    { id: "done", title: "DONE", color: "#36b37e" },
-                ],
-                tasks: []
-            }
-        ]
-    }
-];
+// export const INITIAL_PROJECTS: Project[] = [
+//     {
+//         id: "proj-1",
+//         name: "VictoryGroup",
+//         assignments: [
+//             { userId: "1", roleId: "role-admin" },
+//             { userId: "2", roleId: "role-viewer" }
+//         ],
+//         boards: [
+//             {
+//                 id: "board-1",
+//                 name: "Основная доска",
+//                 columns: [
+//                     { id: "todo", title: "TO DO", color: "#ebecf0" },
+//                     { id: "in-progress", title: "IN PROGRESS", color: "#0052cc" },
+//                     { id: "done", title: "DONE", color: "#36b37e" },
+//                 ],
+//                 tasks: []
+//             }
+//         ]
+//     }
+// ];
 
 export const PROJECT_HIERARCHY: any = {
     "proj-1": {
