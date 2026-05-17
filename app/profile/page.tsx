@@ -25,6 +25,24 @@ interface Project {
     created_at: string;
 }
 
+// Простейшая функция декодирования JWT без проверки подписи
+function decodeJWT<T = Record<string, any>>(token: string): T | null {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+            atob(base64)
+                .split('')
+                .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                .join('')
+        );
+        return JSON.parse(jsonPayload);
+    } catch (error) {
+        console.error('Ошибка декодирования JWT:', error);
+        return null;
+    }
+}
+
 export default function ProfilePage() {
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
@@ -32,22 +50,37 @@ export default function ProfilePage() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Загрузка данных пользователя и проектов
     useEffect(() => {
         const loadData = async () => {
             try {
                 setIsLoading(true);
                 setError(null);
 
-                // Загружаем данные пользователя
-                const userRes = await myFetch<User>(`${CONSTS.API_URL}/users`);
+                // 1. Достаём токен из localStorage (можно заменить на свой способ)
+                const token = localStorage.getItem("access_token");
+                if (!token) {
+                    setError("Токен не найден. Пожалуйста, авторизуйтесь.");
+                    return;
+                }
+
+                // 2. Декодируем токен, чтобы получить id пользователя
+                const decoded = decodeJWT<{ id: number; sub: string; name: string }>(token);
+                if (!decoded || !decoded.id) {
+                    setError("Не удалось извлечь ID из токена.");
+                    return;
+                }
+
+                const userId = decoded.id;
+
+                // 3. Запрашиваем данные пользователя по его id
+                const userRes = await myFetch<User>(`${CONSTS.API_URL}/users/${userId}`);
                 if (!userRes.ok || !userRes.body) {
                     setError("Ошибка загрузки данных пользователя");
                     return;
                 }
                 setUser(userRes.body);
 
-                // Загружаем список проектов
+                // 4. Запрашиваем список проектов (этот эндпоинт не требует id)
                 const projectsRes = await myFetch<Project[]>(`${CONSTS.API_URL}/projects`);
                 if (!projectsRes.ok || !projectsRes.body) {
                     setError("Ошибка загрузки проектов");
@@ -83,7 +116,9 @@ export default function ProfilePage() {
                 <main className="flex-1 flex items-center justify-center">
                     <div className="text-center">
                         <p className="text-red-500 font-medium">{error}</p>
-                        <Button onClick={() => window.location.reload()} className="mt-4">Попробовать снова</Button>
+                        <Button onClick={() => window.location.reload()} className="mt-4">
+                            Попробовать снова
+                        </Button>
                     </div>
                 </main>
             </div>
@@ -106,7 +141,9 @@ export default function ProfilePage() {
             <Header />
 
             <main className="flex-1 overflow-y-auto p-8 max-w-7xl mx-auto w-full">
-                <h1 className="text-2xl font-semibold text-foreground mb-8">Профиль пользователя</h1>
+                <h1 className="text-2xl font-semibold text-foreground mb-8">
+                    Профиль пользователя
+                </h1>
 
                 <div className="grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-8">
                     {/* ЛЕВАЯ КОЛОНКА: Данные профиля */}
@@ -131,10 +168,16 @@ export default function ProfilePage() {
                                 </p>
 
                                 <div className="w-full mt-8 space-y-3">
-                                    <Button variant="outline" className="w-full bg-transparent border-border hover:bg-muted flex items-center justify-center gap-2">
+                                    <Button
+                                        variant="outline"
+                                        className="w-full bg-transparent border-border hover:bg-muted flex items-center justify-center gap-2"
+                                    >
                                         <Camera className="w-4 h-4" /> Изменить фото
                                     </Button>
-                                    <Button variant="outline" className="w-full bg-transparent border-border hover:bg-muted flex items-center justify-center gap-2">
+                                    <Button
+                                        variant="outline"
+                                        className="w-full bg-transparent border-border hover:bg-muted flex items-center justify-center gap-2"
+                                    >
                                         <Lock className="w-4 h-4" /> Изменить пароль
                                     </Button>
                                 </div>
@@ -144,7 +187,6 @@ export default function ProfilePage() {
 
                     {/* ПРАВАЯ КОЛОНКА: Проекты и Уведомления */}
                     <div className="flex flex-col gap-8">
-                        
                         {/* БЛОК ПРОЕКТОВ */}
                         <Card className="bg-card border-border shadow-sm">
                             <CardHeader className="border-b border-border/50 pb-4">
@@ -156,8 +198,8 @@ export default function ProfilePage() {
                                 <div className="divide-y divide-border/50">
                                     {projects.length > 0 ? (
                                         projects.map(project => (
-                                            <div 
-                                                key={project.id} 
+                                            <div
+                                                key={project.id}
                                                 onClick={() => router.push(`/d/${project.id}`)}
                                                 className="flex items-center justify-between p-4 hover:bg-muted/50 cursor-pointer transition-colors group"
                                             >
@@ -166,8 +208,12 @@ export default function ProfilePage() {
                                                         {project.name?.charAt(0) || "P"}
                                                     </div>
                                                     <div>
-                                                        <div className="font-semibold text-foreground group-hover:text-blue-500 transition-colors">{project.name}</div>
-                                                        <div className="text-xs text-muted-foreground mt-0.5">{project.description || "Перейти к доске"}</div>
+                                                        <div className="font-semibold text-foreground group-hover:text-blue-500 transition-colors">
+                                                            {project.name}
+                                                        </div>
+                                                        <div className="text-xs text-muted-foreground mt-0.5">
+                                                            {project.description || "Перейти к доске"}
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <ExternalLink className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -195,7 +241,12 @@ export default function ProfilePage() {
                             <CardContent className="p-0">
                                 <div className="divide-y divide-border/50 max-h-[400px] overflow-y-auto no-scrollbar">
                                     {MOCK_NOTIFICATIONS.map(notif => (
-                                        <div key={notif.id} className={`p-4 flex gap-4 transition-colors hover:bg-muted/30 ${!notif.isRead ? 'bg-blue-500/5' : ''}`}>
+                                        <div
+                                            key={notif.id}
+                                            className={`p-4 flex gap-4 transition-colors hover:bg-muted/30 ${
+                                                !notif.isRead ? 'bg-blue-500/5' : ''
+                                            }`}
+                                        >
                                             <div className="mt-1">
                                                 {!notif.isRead ? (
                                                     <div className="w-2.5 h-2.5 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
@@ -204,7 +255,13 @@ export default function ProfilePage() {
                                                 )}
                                             </div>
                                             <div className="flex-1">
-                                                <p className={`text-sm ${!notif.isRead ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
+                                                <p
+                                                    className={`text-sm ${
+                                                        !notif.isRead
+                                                            ? 'text-foreground font-medium'
+                                                            : 'text-muted-foreground'
+                                                    }`}
+                                                >
                                                     {notif.text}
                                                 </p>
                                                 <span className="text-xs text-muted-foreground/70 mt-1.5 block">
@@ -216,7 +273,6 @@ export default function ProfilePage() {
                                 </div>
                             </CardContent>
                         </Card>
-
                     </div>
                 </div>
             </main>

@@ -5,7 +5,7 @@ import tokenService from "@/entity/Token";
 import { useAppDispatch } from "@/shared/hooks/reduxHooks";
 import { CONSTS } from "@/shared/lib/consts";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { addTask, modifyTask, removeTask } from "../Pipeline/slice";
+import { addTask, modifyTask, moveTask, removeTask } from "../Pipeline/slice";
 import { Task } from "@/entity/Task";
 import { Column } from "@/entity/Column";
 
@@ -67,6 +67,21 @@ export function WSProvider({
                     );
                     break;
                 }
+
+                // case "task_moved": {
+                //     console.log("moved", data);
+                //     const { old_column_id, column_id, order, id } = data;
+                //     dispatch(
+                //         moveTask({
+                //             newColumnId: column_id,
+                //             oldColumnId: old_column_id,
+                //             order: order,
+                //             taskId: id,
+                //         }),
+                //     );
+                //     console.log("zzzzzz");
+                //     break;
+                // }
 
                 default:
                     console.warn("Необузданный event", type);

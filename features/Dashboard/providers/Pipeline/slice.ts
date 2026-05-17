@@ -41,6 +41,10 @@ export const pipelineSlice = createAppSlice({
                     state.isLoading = true;
                 },
                 fulfilled: (state, action) => {
+                    const pp = action.payload;
+                    pp.columns.forEach((c) =>
+                        c.tasks.sort((a, b) => a.order - b.order),
+                    );
                     state.isLoading = false;
                     state.pipelineInfo = action.payload;
                 },
@@ -235,6 +239,139 @@ export const pipelineSlice = createAppSlice({
                 }
             },
         ),
+
+        // moveTask: create.reducer(
+        //     (
+        //         state,
+        //         action: PayloadAction<{
+        //             taskId: Task["id"];
+        //             oldColumnId: Column["id"];
+        //             newColumnId: Column["id"];
+        //             order: number;
+        //         }>,
+        //     ) => {
+        //         if (!state.pipelineInfo) return;
+
+        //         const { oldColumnId, newColumnId, taskId, order } =
+        //             action.payload;
+        //         const column = state.pipelineInfo.columns.find(
+        //             (col) => col.id === oldColumnId,
+        //         );
+        //         if (!column) return;
+        //         const taskIndex = column.tasks.findIndex(
+        //             (t) => t.id === taskId,
+        //         );
+        //         if (oldColumnId !== newColumnId) {
+        //             const task = column.tasks.splice(taskIndex, 1)[0];
+        //             const newColumn = state.pipelineInfo.columns.find(
+        //                 (col) => col.id === newColumnId,
+        //             );
+        //             if (!newColumn) return;
+        //             newColumn.tasks.push(task);
+        //             newColumn.tasks.sort((a, b) => a.order - b.order);
+        //         } else {
+        //             for (let i = taskIndex + 1; i < column.tasks.length; i++) {
+        //                 column.tasks[i].order += 1;
+        //             }
+        //             column.tasks[taskIndex].order = order;
+        //             column.tasks.sort((a, b) => a.order - b.order);
+        //         }
+        //     },
+        // ),
+
+        moveTask: create.reducer(
+            (
+                state,
+                action: PayloadAction<{
+                    taskId: Task["id"];
+                    oldColumnId: Column["id"];
+                    newColumnId: Column["id"];
+                    order: number; // целевой индекс в колонке назначения
+                }>,
+            ) => {
+                if (!state.pipelineInfo) return;
+
+                const { oldColumnId, newColumnId, taskId, order } =
+                    action.payload;
+
+                const oldColumn = state.pipelineInfo.columns.find(
+                    (col) => col.id === oldColumnId,
+                );
+                if (!oldColumn) return;
+
+                const taskIndex = oldColumn.tasks.findIndex(
+                    (t) => t.id === taskId,
+                );
+                if (taskIndex === -1) return;
+
+                // Удаляем задачу из старой колонки
+                const [task] = oldColumn.tasks.splice(taskIndex, 1);
+
+                if (oldColumnId !== newColumnId) {
+                    const newColumn = state.pipelineInfo.columns.find(
+                        (col) => col.id === newColumnId,
+                    );
+                    if (!newColumn) return;
+
+                    // Вставляем на нужную позицию (с учётом границ)
+                    const targetIndex = Math.min(order, newColumn.tasks.length);
+                    newColumn.tasks.splice(targetIndex, 0, task);
+
+                    // Переназначаем order по индексу в новой колонке
+                    newColumn.tasks.forEach((t, idx) => {
+                        t.order = idx;
+                    });
+                } else {
+                    // Перемещение внутри той же колонки
+                    let targetIndex = order;
+
+                    // Корректируем индекс, т.к. задача уже удалена
+                    if (targetIndex > taskIndex) {
+                        targetIndex -= 1;
+                    }
+                    targetIndex = Math.min(targetIndex, oldColumn.tasks.length);
+
+                    oldColumn.tasks.splice(targetIndex, 0, task);
+
+                    // Переназначаем order по индексу
+                    oldColumn.tasks.forEach((t, idx) => {
+                        t.order = idx;
+                    });
+                }
+            },
+        ),
+
+        fetchMoveTask: create.asyncThunk(
+            async (
+                payload: {
+                    projectId: Project["id"];
+                    newColumnId: Column["id"];
+                    columnId: Column["id"];
+                    taskId: Task["id"];
+                    order: number;
+                },
+                { dispatch },
+            ) => {
+                const { projectId, columnId, newColumnId, taskId, order } =
+                    payload;
+
+                const res = await taskService.move(
+                    projectId,
+                    taskId,
+                    columnId,
+                    order,
+                );
+                if (!res.ok) {
+                    toast.error(
+                        res.errors[0] ??
+                            "Произошла ошибка при перемещении задачи",
+                    );
+                }
+
+                return res.ok;
+            },
+        ),
+
         removeTask: create.reducer(
             (
                 state,
@@ -266,8 +403,8 @@ export const pipelineSlice = createAppSlice({
                     toast.error(
                         res.errors[0] ?? "Произошла ошибка при удалении задачи",
                     );
-                    return;
                 }
+                return res.ok;
             },
         ),
     }),
@@ -292,6 +429,9 @@ export const {
 
     removeTask,
     fetchRemoveTask,
+
+    moveTask,
+    fetchMoveTask,
 
     addColumn,
     fetchCreateColumn,
