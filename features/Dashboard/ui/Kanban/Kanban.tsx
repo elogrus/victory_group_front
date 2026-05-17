@@ -167,7 +167,7 @@ export function Board() {
         });
         setColumns(x);
         setLastColumns(x);
-    }, [origColumns]);
+    }, []);
     const dispatch = useAppDispatch();
     console.log("origColumns", origColumns);
     console.log("Done", columns.Done);
